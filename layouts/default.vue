@@ -1,6 +1,11 @@
 <template>
   <v-app dark>
     <Header />
+    <v-content>
+      <v-container>
+        <nuxt />
+      </v-container>
+    </v-content>
     <v-footer
       :fixed="fixed"
       app

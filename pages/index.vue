@@ -9,7 +9,9 @@
       sm8
       md6
     >
-      <h1 class="text-xs-center">Homepage</h1>
+      <h1 class="text-xs-center">
+        Homepage
+      </h1>
       <div class="text-xs-center">
         Carrousel
       </div>
