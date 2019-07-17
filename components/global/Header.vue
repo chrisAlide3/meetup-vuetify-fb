@@ -20,7 +20,7 @@
 
       <v-list dense class="pt-0">
         <v-list-tile
-          v-for="item in items"
+          v-for="item in menuItems"
           :key="item.title"
           router
           :to="item.route"
@@ -55,7 +55,7 @@
       <v-toolbar-items class="hidden-xs-only">
         <v-btn
           flat 
-          v-for="item in items" :key="item.title"
+          v-for="item in menuItems" :key="item.title"
           router
           :to="item.route"
         >
@@ -73,19 +73,27 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
-      items: [
-        { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
-        { title: 'Profile', icon: 'person', route: '/profile' },
-        { title: 'Login', icon: 'exit_to_app', route: '/auth?isLogin=true' },
-        { title: 'Register', icon: 'account_circle', route: '/auth?isLogin=false' }
-      ],
-      right: null,
       drawer: false
     }
   },
-
+  computed: {
+    menuItems () {
+      let menuItems = [
+        { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
+        { title: 'Login', icon: 'exit_to_app', route: '/auth?isLogin=true' },
+        { title: 'Register', icon: 'account_circle', route: '/auth?isLogin=false' }
+      ]
+      if (this.$store.getters.isLoggedIn) {
+        menuItems = [
+          { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
+          { title: 'Profile', icon: 'person', route: '/profile' }
+        ]
+      }
+      return menuItems
+    }
+  },
   methods: {
     navTo() {
 

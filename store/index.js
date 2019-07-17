@@ -80,5 +80,12 @@ export const getters = {
   },
   user (state) {
     return state.user
+  },
+  isLoggedIn (state) {
+    if (state.user.id) {
+      return true
+    } else {
+      return false
+    }
   }
 }
