@@ -17,14 +17,22 @@ export default {
   methods: {
     register (formData) {
       this.$store.dispatch('register', formData)
-        .then(data => {
-          this.$router.go(-1)
+        .then(() => {
+          if (this.$store.getters.error === '') {
+            this.$router.push('/')
+          } else {
+            alert(this.$store.getters.error)
+          }
         })
     },
     login (formData) {
       this.$store.dispatch('login', formData)
-        .then(data => {
-          this.$router.go(-1)
+        .then(() => {
+          if (this.$store.getters.error === '') {
+            this.$router.push('/')
+          } else {
+            alert(this.$store.getters.error)
+          }
         })
     }
   }
