@@ -1,11 +1,7 @@
 <template>
   <div>
-    <h1>
-      Auth route
-    </h1>
-
-    <Login v-if="$route.query.isLogin === 'true'" />
-    <Register v-else />
+    <Login v-if="$route.query.isLogin === 'true'" @login="login" />
+    <Register v-else @register="register" />
   </div>
 </template>
 
@@ -18,5 +14,19 @@ export default {
     Login,
     Register
   },
+  methods: {
+    register (formData) {
+      this.$store.dispatch('register', formData)
+        .then(data => {
+          this.$router.go(-1)
+        })
+    },
+    login (formData) {
+      this.$store.dispatch('login', formData)
+        .then(data => {
+          this.$router.go(-1)
+        })
+    }
+  }
 }
 </script>
