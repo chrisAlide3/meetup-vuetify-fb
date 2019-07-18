@@ -6,24 +6,28 @@
   >
     <v-text-field
       v-model="formData.firstname"
+      :rules="firstnameRules"
       label="Firstname"
       required
     ></v-text-field>
 
     <v-text-field
       v-model="formData.surname"
+      :rules="surnameRules"
       label="Surname"
       required
     ></v-text-field>
 
     <v-text-field
       v-model="formData.email"
+      :rules="emailRules"
       label="E-mail"
       required
     ></v-text-field>
 
     <v-text-field
       v-model="formData.password"
+      :rules="passwordRules"
       :append-icon="showPassword ? 'visibility' : 'visibility_off'"
       :type="showPassword ? 'text' : 'password'"
       name="input-10-1"
@@ -35,6 +39,7 @@
     </v-text-field>
 
     <v-btn
+      :disabled="!valid"
       color="success"
       @click="register"
     >
@@ -61,6 +66,22 @@
     data: () => ({
       showPassword: false,
       valid: true,
+
+      firstnameRules: [
+        v => !!v || 'Firstname is required',
+      ],
+      surnameRules: [
+        v => !!v || 'Surname is required',
+      ],
+      emailRules: [
+        v => !!v || 'E-mail is required',
+        v => /.+@.+/.test(v) || 'E-mail must be valid'
+      ],
+      passwordRules: [
+        v => !!v || 'Password is required',
+        v => (v && v.length >= 8) || 'Password must have at least 8 characters'
+      ],
+
       formData: {
         firstname: '',
         surname: '',
@@ -71,7 +92,9 @@
 
     methods: {
       register () {
-        this.$emit('register', this.formData)
+        if (this.$refs.form.validate()) {
+          this.$emit('register', this.formData)
+        }
       },
       reset () {
         this.$refs.form.reset()
