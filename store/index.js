@@ -1,4 +1,6 @@
-import * as firebase from 'firebase'
+// import * as firebase from 'firebase'
+import { fireAuth, fireDb, fireStorage } from '~/plugins/firebase.js'
+
 
 export const state = () => ({
   user: {},
@@ -17,7 +19,7 @@ export const mutations = {
 export const actions = {
   register ({ commit }, formData) {
     return (
-      firebase.auth().createUserWithEmailAndPassword(formData.email, formData.password)
+      fireAuth.createUserWithEmailAndPassword(formData.email, formData.password)
         .then(res => {
           // Write user to firebase
           const user = {
@@ -28,7 +30,7 @@ export const actions = {
             registeredMeetups: []
           }
           return (
-            firebase.firestore().collection("users").add(user)
+            fireDb.collection("users").add(user)
               .then(function(docRef) {
                 // Write user to state
                 const newUser = { ...user, id: docRef.id }
@@ -49,15 +51,14 @@ export const actions = {
   },
   login ({ commit }, formData) {
     return (
-      firebase.auth().signInWithEmailAndPassword(formData.email, formData.password)
-        .then(res => {
+      fireAuth.signInWithEmailAndPassword(formData.email, formData.password)
+      .then(res => {
           // Read userdata with authid
           let user = {}
-          const usersRef = firebase.firestore().collection("users")
+          const usersRef = fireDb.collection("users")
           const query =  usersRef.where("authid", "==", res.user.uid)
            return query.get()
             .then(function (querySnapshot) {
-              // commit('loadUser', user)
               querySnapshot.forEach(function (doc) {
                 user = {...doc.data(), id: doc.id}
               })

@@ -1,16 +1,15 @@
-// import Vue from 'vue'
-import * as firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/firestore'
+import 'firebase/storage'
+import { firebaseConfig } from '~/.config'
 
-const config = {
-  apiKey: 'AIzaSyAgB7MrRcKXJUr5jSpDRCKzi3ICqcg3wgk',
-  authDomain: 'meetup-vuetify-fb.firebaseapp.com',
-  databaseURL: 'https://meetup-vuetify-fb.firebaseio.com',
-  projectId: 'meetup-vuetify-fb',
-  storageBucket: 'meetup-vuetify-fb.appspot.com'
+
+if (!firebase.apps.length) {
+  firebase.initializeApp(firebaseConfig)
 }
 
-!firebase.apps.length ? firebase.initializeApp(config) : ''
-
-export default {
-  
-}
+const fireAuth = firebase.auth()
+const fireDb = firebase.firestore()
+const fireStorage = firebase.storage()
+export {fireAuth, fireDb, fireStorage}
