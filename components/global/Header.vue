@@ -88,7 +88,7 @@ export default {
       if (this.$store.getters.isLoggedIn) {
         menuItems = [
           { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
-          { title: 'Profile', icon: 'person', route: '/profile' }
+          { title: 'Profile', icon: 'person', route: '/users/' + this.$store.getters.user.id }
         ]
       }
       return menuItems

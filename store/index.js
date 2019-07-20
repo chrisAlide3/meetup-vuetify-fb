@@ -13,6 +13,10 @@ export const mutations = {
   },
   setError (state, error) {
     state.error = error
+  },
+  updateUser ( state, formData) {
+    state.user.firstname = formData.firstname
+    state.user.surname = formData.surname
   }
 }
 
@@ -72,6 +76,22 @@ export const actions = {
           console.error('Invalid login', err)
         })
     )
+  },
+  updateProfile ({ commit }, payload) {
+    const userRef = fireDb.collection('users').doc(payload.userid)
+    const setWithMerge = userRef.set({
+      firstname: payload.formData.firstname,
+      surname: payload.formData.surname,
+    }, { merge: true })
+  
+    return setWithMerge
+      .then(function() {
+        console.log("Document successfully written!");
+        commit('updateUser', payload.formData)
+      })
+      .catch(function(error) {
+          console.error("Error writing document: ", error);
+      });
   }
 }
 

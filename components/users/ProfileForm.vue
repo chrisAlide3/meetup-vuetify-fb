@@ -23,28 +23,16 @@
       :rules="emailRules"
       label="E-mail"
       required
-    >
-    </v-text-field>
-
-    <v-text-field
-      v-model="formData.password"
-      :rules="passwordRules"
-      :append-icon="showPassword ? 'visibility' : 'visibility_off'"
-      :type="showPassword ? 'text' : 'password'"
-      name="input-10-1"
-      label="Password"
-      hint="At least 8 characters"
-      counter
-      @click:append="showPassword = !showPassword"
+      disabled
     >
     </v-text-field>
 
     <v-btn
       :disabled="!valid"
       color="success"
-      @click="register"
+      @click="saveProfile"
     >
-      Register
+      Save
     </v-btn>
 
     <v-btn
@@ -65,12 +53,10 @@
 <script>
   export default {
     created () {
-      console.log(this.user)
       if (this.user) {
         this.formData.firstname = this.user.firstname
         this.formData.surname = this.user.surname
         this.formData.email = this.user.email
-        this.formData.password = '12345678' // dummy password for validation
       }
     },
     data: () => ({
@@ -96,13 +82,22 @@
         firstname: '',
         surname: '',
         email: '',
-        password: ''
       }
     }),
+    props: {
+      user: {
+        type: Object,
+        required: true
+      }
+    },
     methods: {
-      register () {
+      saveProfile () {
         if (this.$refs.form.validate()) {
-          this.$emit('register', this.formData)
+         const payload = {
+            userid: this.$route.params.id,
+            formData: this.formData
+          }
+          this.$emit('saveProfile', payload)
         }
       },
       reset () {
