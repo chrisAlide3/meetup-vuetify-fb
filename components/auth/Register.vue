@@ -27,7 +27,25 @@
                 :rules="surnameRules"
                 label="Surname"
                 required
-              ></v-text-field>
+              >
+              </v-text-field>
+
+              <v-btn
+                raised
+                color="primary"
+                @click="onPickFile"
+              >Upload image
+              </v-btn>
+              <input
+                type="file"
+                style="display: none"
+                ref="fileInput"
+                accept="image/*"
+                @change="onFilePicked"
+              >
+              <v-layout row v-if="imgUrl">
+              <img :src="imgUrl" height="150" >
+              </v-layout>
 
               <v-text-field
                 v-model="formData.email"
@@ -81,14 +99,6 @@
 
 <script>
   export default {
-    created () {
-      if (this.user) {
-        this.formData.firstname = this.user.firstname
-        this.formData.surname = this.user.surname
-        this.formData.email = this.user.email
-        this.formData.password = '12345678' // dummy password for validation
-      }
-    },
     data: () => ({
       showPassword: false,
       valid: true,
@@ -111,9 +121,11 @@
       formData: {
         firstname: '',
         surname: '',
+        image: null,
         email: '',
         password: ''
-      }
+      },
+      imgUrl: '',
     }),
     computed: {
       error () {
@@ -138,6 +150,26 @@
       },
       onDismissed () {
         this.$store.dispatch('clearError')
+      },
+      onPickFile () {
+        this.$refs.fileInput.click()
+      },
+      onFilePicked (event) {
+        if (!event.target.files[0]) {
+          return
+        }
+        const files = event.target.files
+        const filename = files[0].name
+        if (filename.lastIndexOf('.') <= 0) {
+          return alert('Invalid file. File must have an image extension')
+        }
+        // convert picked file to baseUrl format to display preview of chosen file
+        const fileReader = new FileReader()
+        fileReader.addEventListener('load', () => {
+          this.imgUrl = fileReader.result
+        })
+        fileReader.readAsDataURL(files[0])
+        this.formData.image = files[0]
       }
     }
   }

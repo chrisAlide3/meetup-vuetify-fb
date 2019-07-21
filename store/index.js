@@ -33,6 +33,9 @@ export const mutations = {
 
 export const actions = {
   register ({ commit }, formData) {
+    let key = ''
+    let imageUrl = ''
+
     return (
       fireAuth.createUserWithEmailAndPassword(formData.email, formData.password)
         .then(res => {
@@ -49,6 +52,35 @@ export const actions = {
               .then(function(docRef) {
                 // Write user to state
                 const newUser = { ...user, id: docRef.id }
+                key = docRef.id
+                // Upload image to firestore
+                if (formData.image) {
+                  console.log('image found')
+                  const imageName = formData.image.name
+                  const ext = imageName.slice(imageName.lastIndexOf('.'))
+                  const ref = fireStorage.ref('users/' + docRef.id + ext)
+                  return ref.put(formData.image)
+                    .then(snapshot => {
+                      console.log('image uploaded')
+                      return snapshot.ref.getDownloadURL()
+                        .then(downloadURL => {
+                          imageUrl = downloadURL                            
+                          console.log('imageUrl: ', imageUrl)
+                          const userRef = fireDb.collection('users').doc(key)
+                          const setWithMerge = userRef.set({
+                            imgUrl: imageUrl,
+                          }, { merge: true })
+                          return setWithMerge
+                            .then(() => {
+                              newUser.imgUrl = imageUrl
+                              console.log('Image URL updated')
+                            })
+                            .catch(err => console.log(err))
+                        })
+                        .catch(err => console.log(err))
+                    })
+                    .catch(err => console.log(err))
+                }
                 commit('clearError')
                 commit('loadUser', newUser)
               })
