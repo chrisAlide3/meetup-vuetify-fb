@@ -28,7 +28,33 @@
                 :rules="surnameRules"
                 label="Surname"
                 required
-              ></v-text-field>
+              >
+              </v-text-field>
+
+              <v-layout row>
+                <v-btn v-if="formData.imgUrl == ''"
+                  raised
+                  color="primary"
+                  @click="onPickFile"
+                >Upload image
+                </v-btn>
+                <v-btn v-if="!formData.imgUrl == ''"
+                  raised
+                  color="error"
+                  @click="onRemoveFile"
+                >Remove image
+                </v-btn>
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="fileInput"
+                  accept="image/*"
+                  @change="onFilePicked"
+                >
+              </v-layout>
+              <v-layout row v-if="formData.imgUrl">
+                <img :src="formData.imgUrl" height="150" >
+              </v-layout>
 
               <v-text-field
                 v-model="formData.email"
@@ -75,6 +101,8 @@
         this.formData.firstname = this.user.firstname
         this.formData.surname = this.user.surname
         this.formData.email = this.user.email
+        this.formData.imgUrl = this.user.imgUrl
+        this.formData.imgName = this.user.imgName
       }
     },
     data: () => ({
@@ -99,6 +127,9 @@
       formData: {
         firstname: '',
         surname: '',
+        imgUrl: '',
+        imgName: '',
+        image: null,
         email: '',
       }
     }),
@@ -135,6 +166,39 @@
       },
       onDismiss () {
         this.$store.dispatch('clearError')
+      },
+      onPickFile () {
+        this.$refs.fileInput.click()
+      },
+      onFilePicked (event) {
+        if (!event.target.files[0]) {
+          return
+        }
+        const files = event.target.files
+        const filename = files[0].name
+        if (filename.lastIndexOf('.') <= 0) {
+          return alert('Invalid file. File must have an image extension')
+        }
+        // convert picked file to baseUrl format to display preview of chosen file
+        const fileReader = new FileReader()
+        fileReader.addEventListener('load', () => {
+          this.formData.imgUrl = fileReader.result
+        })
+        fileReader.readAsDataURL(files[0])
+        this.formData.image = files[0]
+      },
+      onRemoveFile () {
+        const payload = {
+          userid: this.user.id,
+          imgName: this.formData.imgName
+        }
+        this.$store.dispatch('removeImage', payload)
+          .then(() => {
+            console.log('image deleted')
+            this.formData.imgUrl = ''
+            this.formData.imgName = ''
+            this.formData.image = null
+          })
       }
     }
   }

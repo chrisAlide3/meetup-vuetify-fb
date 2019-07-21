@@ -30,21 +30,29 @@
               >
               </v-text-field>
 
-              <v-btn
-                raised
-                color="primary"
-                @click="onPickFile"
-              >Upload image
-              </v-btn>
-              <input
-                type="file"
-                style="display: none"
-                ref="fileInput"
-                accept="image/*"
-                @change="onFilePicked"
-              >
+              <v-layout row>
+                <v-btn v-if="!formData.image"
+                  raised
+                  color="primary"
+                  @click="onPickFile"
+                >Upload image
+                </v-btn>
+                <v-btn v-if="formData.image"
+                  raised
+                  color="error"
+                  @click="onRemoveFile"
+                >Remove image
+                </v-btn>
+                <input
+                  type="file"
+                  style="display: none"
+                  ref="fileInput"
+                  accept="image/*"
+                  @change="onFilePicked"
+                >
+              </v-layout>
               <v-layout row v-if="imgUrl">
-              <img :src="imgUrl" height="150" >
+                <img :src="imgUrl" height="150" >
               </v-layout>
 
               <v-text-field
@@ -170,6 +178,10 @@
         })
         fileReader.readAsDataURL(files[0])
         this.formData.image = files[0]
+      },
+      onRemoveFile () {
+        this.formData.image = null
+        this.imgUrl = ''
       }
     }
   }
