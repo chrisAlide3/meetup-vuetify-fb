@@ -18,6 +18,7 @@ export default {
     register (formData) {
       this.$store.dispatch('register', formData)
         .then(() => {
+          this.$store.dispatch('clearLoading')
           if (!this.$store.getters.error) {
             this.$router.push('/')
           }
@@ -26,6 +27,7 @@ export default {
     login (formData) {
       this.$store.dispatch('login', formData)
         .then(() => {
+          this.$store.dispatch('clearLoading')
           if (!this.$store.getters.error) {
             this.$router.push('/')
           }

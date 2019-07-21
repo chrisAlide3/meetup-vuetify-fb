@@ -4,7 +4,7 @@ import { fireAuth, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 export const state = () => ({
   user: {},
-  loading: false,
+  loading: [],
   error: null
 })
 
@@ -22,14 +22,17 @@ export const mutations = {
   clearError (state) {
     state.error = null
   },
-  loading (state, payload) {
-    state.loading = payload
+  loading (state, element) {
+    // state.loading = payload
+    state.loading.push(element)
+  },
+  clearLoading (state) {
+    state.loading = []
   }
 }
 
 export const actions = {
   register ({ commit }, formData) {
-    commit('loading', true)
     return (
       fireAuth.createUserWithEmailAndPassword(formData.email, formData.password)
         .then(res => {
@@ -48,24 +51,20 @@ export const actions = {
                 const newUser = { ...user, id: docRef.id }
                 commit('clearError')
                 commit('loadUser', newUser)
-                commit('loading', false)
               })
               .catch(function(err) {
                 commit('setError', err)
-                commmit('loading', false)
                   console.error("Error adding document: ", err);
               })
           )
         })
         .catch(err => {
-          commit('loading', false)
           commit('setError', err)
           console.error(err)
         })
     )
   },
   login ({ commit }, formData) {
-    commit('loading', true)
     return (
       fireAuth.signInWithEmailAndPassword(formData.email, formData.password)
       .then(res => {
@@ -78,25 +77,21 @@ export const actions = {
               querySnapshot.forEach(function (doc) {
                 user = {...doc.data(), id: doc.id}
               })
-              commit('loading', false)
               commit('clearError')
               commit('loadUser', user)
             })
             .catch(err => {
-              commit('loading', false)
               commit('setError', err)
               console.error(err)
             })
         })
         .catch(err => {
-          commit('loading', false)
           commit('setError', err)
           console.error(err)
         })
     )
   },
   updateProfile ({ commit }, payload) {
-    commit('loading', true)
     const userRef = fireDb.collection('users').doc(payload.userid)
     const setWithMerge = userRef.set({
       firstname: payload.formData.firstname,
@@ -108,16 +103,20 @@ export const actions = {
         console.log("Document successfully written!");
         commit('updateUser', payload.formData)
         commit('clearError')
-        commit('loading', false)
       })
       .catch((err) => {
-        commit('loading', false)
         commit('setError', err)
           console.error("Error writing document: ", err);
       });
   },
   clearError ({ commit }) {
     commit('clearError')
+  },
+  loading ( {commit }, element) {
+    commit('loading', element)
+  },
+  clearLoading ({ commit }) {
+    commit('clearLoading')
   }
 }
 
@@ -134,5 +133,8 @@ export const getters = {
     } else {
       return false
     }
+  },
+  loading (state) {
+    return state.loading
   }
 }

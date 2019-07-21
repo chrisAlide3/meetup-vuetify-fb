@@ -51,7 +51,8 @@
               </v-text-field>
 
               <v-btn
-                :disabled="!valid"
+                :loading="loading.includes('register')"
+                :disabled="!valid || loading.includes('register')"
                 color="success"
                 @click="register"
               >
@@ -81,7 +82,6 @@
 <script>
   export default {
     created () {
-      console.log(this.user)
       if (this.user) {
         this.formData.firstname = this.user.firstname
         this.formData.surname = this.user.surname
@@ -118,11 +118,15 @@
     computed: {
       error () {
         return this.$store.getters.error
+      },
+      loading () {
+        return this.$store.getters.loading
       }
     },
     methods: {
       register () {
         if (this.$refs.form.validate()) {
+          this.$store.dispatch('loading', 'register')
           this.$emit('register', this.formData)
         }
       },

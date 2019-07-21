@@ -40,7 +40,8 @@
               </v-text-field>
 
               <v-btn
-                :disabled="!valid"
+                :loading="loading.includes('profile')"
+                :disabled="!valid || loading.includes('profile')"
                 color="success"
                 @click="saveProfile"
               >
@@ -110,12 +111,16 @@
     computed: {
       error () {
         return this.$store.getters.error
+      },
+      loading () {
+        return this.$store.getters.loading
       }
     },
     methods: {
       saveProfile () {
         if (this.$refs.form.validate()) {
-         const payload = {
+          this.$store.dispatch('loading', 'profile')
+          const payload = {
             userid: this.$route.params.id,
             formData: this.formData
           }

@@ -22,7 +22,7 @@ export default {
     saveProfile (payload) {
       this.$store.dispatch('updateProfile', payload)
         .then(() => {
-          console.log('Profile updated')
+          this.$store.dispatch('clearLoading')
           this.$router.push('/')
         })
     }

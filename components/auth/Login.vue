@@ -36,7 +36,8 @@
                 </v-text-field>
 
                 <v-btn
-                  :disabled="!valid"
+                  :loading="loading.includes('login')"
+                  :disabled="!valid || loading.includes('login')"
                   color="success"
                   @click="login"
                 >
@@ -87,14 +88,17 @@ export default {
 
     computed: {
       error () {
-        console.log(this.$store.getters.error)
         return this.$store.getters.error
+      },
+      loading () {
+        return this.$store.getters.loading
       }
     },
 
     methods: {
       login () {
         if (this.$refs.form.validate()) {
+          this.$store.dispatch('loading', 'login')
           this.$emit('login', this.formData)
         }
       },
