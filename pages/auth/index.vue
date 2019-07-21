@@ -18,20 +18,16 @@ export default {
     register (formData) {
       this.$store.dispatch('register', formData)
         .then(() => {
-          if (this.$store.getters.error === '') {
+          if (!this.$store.getters.error) {
             this.$router.push('/')
-          } else {
-            alert(this.$store.getters.error)
           }
         })
     },
     login (formData) {
       this.$store.dispatch('login', formData)
         .then(() => {
-          if (this.$store.getters.error === '') {
+          if (!this.$store.getters.error) {
             this.$router.push('/')
-          } else {
-            alert(this.$store.getters.error)
           }
         })
     }

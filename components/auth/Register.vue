@@ -1,65 +1,81 @@
 <template>
-  <v-form
-    ref="form"
-    v-model="valid"
-    lazy-validation
-  >
-    <v-text-field
-      v-model="formData.firstname"
-      :rules="firstnameRules"
-      label="Firstname"
-      required
-    ></v-text-field>
+  <v-container>
+    <v-layout row justify-center v-if="error">
+      <v-flex xs12 sm6>
+        <Alert :message="error.message" @dismissed='onDismissed' />        
+      </v-flex>
+    </v-layout>
 
-    <v-text-field
-      v-model="formData.surname"
-      :rules="surnameRules"
-      label="Surname"
-      required
-    ></v-text-field>
+    <v-layout row justify-center>
+      <v-flex xs12 sm6>
+        <v-card>
+          <v-card-text>
+            <v-form
+              ref="form"
+              v-model="valid"
+              lazy-validation
+            >
+              <v-text-field
+                v-model="formData.firstname"
+                :rules="firstnameRules"
+                label="Firstname"
+                required
+              ></v-text-field>
 
-    <v-text-field
-      v-model="formData.email"
-      :rules="emailRules"
-      label="E-mail"
-      required
-    >
-    </v-text-field>
+              <v-text-field
+                v-model="formData.surname"
+                :rules="surnameRules"
+                label="Surname"
+                required
+              ></v-text-field>
 
-    <v-text-field
-      v-model="formData.password"
-      :rules="passwordRules"
-      :append-icon="showPassword ? 'visibility' : 'visibility_off'"
-      :type="showPassword ? 'text' : 'password'"
-      name="input-10-1"
-      label="Password"
-      hint="At least 8 characters"
-      counter
-      @click:append="showPassword = !showPassword"
-    >
-    </v-text-field>
+              <v-text-field
+                v-model="formData.email"
+                :rules="emailRules"
+                label="E-mail"
+                required
+              >
+              </v-text-field>
 
-    <v-btn
-      :disabled="!valid"
-      color="success"
-      @click="register"
-    >
-      Register
-    </v-btn>
+              <v-text-field
+                v-model="formData.password"
+                :rules="passwordRules"
+                :append-icon="showPassword ? 'visibility' : 'visibility_off'"
+                :type="showPassword ? 'text' : 'password'"
+                name="input-10-1"
+                label="Password"
+                hint="At least 8 characters"
+                counter
+                @click:append="showPassword = !showPassword"
+              >
+              </v-text-field>
 
-    <v-btn
-      color="error"
-      @click="reset"
-    >
-      Reset Form
-    </v-btn>
+              <v-btn
+                :disabled="!valid"
+                color="success"
+                @click="register"
+              >
+                Register
+              </v-btn>
 
-    <v-btn
-      @click="cancel"
-    >
-      Cancel
-    </v-btn>
-  </v-form>
+              <v-btn
+                color="error"
+                @click="reset"
+              >
+                Reset Form
+              </v-btn>
+
+              <v-btn
+                @click="cancel"
+              >
+                Cancel
+              </v-btn>
+            </v-form>
+          </v-card-text>
+        </v-card>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 
 <script>
@@ -99,6 +115,11 @@
         password: ''
       }
     }),
+    computed: {
+      error () {
+        return this.$store.getters.error
+      }
+    },
     methods: {
       register () {
         if (this.$refs.form.validate()) {
@@ -109,7 +130,10 @@
         this.$refs.form.reset()
       },
       cancel () {
-        this.$router.go(-1)
+        this.$router.push('/')
+      },
+      onDismissed () {
+        this.$store.dispatch('clearError')
       }
     }
   }

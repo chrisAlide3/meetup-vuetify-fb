@@ -5,13 +5,13 @@
     :value="true"
     @input="onClose"
   >
-    {{ text }}
+    {{ message }}
   </v-alert>
 </template>
 
 <script>
 export default {
-  props: ['text'],
+  props: ['message'],
   methods: {
     onClose () {
       this.$emit('dismissed')

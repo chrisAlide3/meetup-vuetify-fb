@@ -115,6 +115,9 @@ export const actions = {
         commit('setError', err)
           console.error("Error writing document: ", err);
       });
+  },
+  clearError ({ commit }) {
+    commit('clearError')
   }
 }
 
