@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1>
-      Meetups update route
+      Meetup detail route
     </h1>
     <Form />
   </div>
