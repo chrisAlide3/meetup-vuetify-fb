@@ -32,13 +32,13 @@
               </v-text-field>
 
               <v-layout row>
-                <v-btn v-if="formData.imgUrl == ''"
+                <v-btn v-if="formData.imgName == ''"
                   raised
                   color="primary"
                   @click="onPickFile"
                 >Upload image
                 </v-btn>
-                <v-btn v-if="!formData.imgUrl == ''"
+                <v-btn v-if="!formData.imgName == ''"
                   raised
                   color="error"
                   :loading="loading.includes('removeImage')"
