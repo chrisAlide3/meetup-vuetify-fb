@@ -83,9 +83,37 @@
                 </v-flex>
               </v-layout>
 
+              <v-layout row wrap justify-center>
+                <v-flex xs12 sm10>
+                  <v-date-picker
+                    v-model="formData.date"
+                    :landscape="landscape"
+                    :reactive="reactive">
+                  </v-date-picker>
+                </v-flex>
+              </v-layout>
+
+              <v-layout row wrap justify-center class="mt-3">
+                <v-flex xs12 sm10>
+                  <v-time-picker
+                    v-model="formData.time"
+                    :rules="timeRules"
+                    format="24hr"
+                    :landscape="landscape">
+                    </v-time-picker>
+                  </v-flex>
+              </v-layout>
+
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
-                  <v-btn color="success" depressed round>Save</v-btn>
+                  <v-btn 
+                    color="success" 
+                    depressed
+                    round
+                    :disabled="!valid"
+                    @click="save"
+                  >Save
+                </v-btn>
                 </v-flex>
 
               </v-layout>
@@ -107,6 +135,7 @@ export default {
       this.formData.location = this.meetup.location
       this.formData.description = this.meetup.description,
       this.formData.date = this.meetup.date,
+      this.formData.time = this.meetup.time,
       this.formData.userId = this.meetup.userId,
       this.formData.imgName = this.meetup.imgName,
       this.formData.imgUrl = this.meetup.imgUrl
@@ -115,6 +144,8 @@ export default {
   data () {
     return {
       valid: true,
+      landscape: true,
+      reactive: false,
 
       titleRules: [
         v => !!v || 'Title is required',
@@ -125,13 +156,17 @@ export default {
       locationRules: [
         v => !!v || 'Location is required',
       ],
+      timeRules: [
+        v => !!v || 'Time is required',
+      ],
 
       formData: {
         title: '',
         location: '',
         description: '',
-        date: null,
-        userId: '',
+        date: new Date().toISOString().substr(0, 10),
+        time: null,
+        userId: this.userId,
         imgName: '',
         imgUrl: '',
         image: null
@@ -144,7 +179,22 @@ export default {
       required: false
     }
   },
+  computed: {
+    userId () {
+      return this.$store.getters.user.id
+    }
+  },
   methods: {
+    save () {
+      if (this.meetup & this.$refs.form.validate()) {
+        console.log('Update meetup')
+      } 
+      if (!this.meetup & this.$refs.form.validate()) {
+        delete this.formData['imgUrl']
+        console.log('add meetup')
+        console.log(this.formData)
+      }
+    },
     onPickFile () {
         this.$refs.fileInput.click()
       },
