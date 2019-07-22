@@ -20,7 +20,8 @@
                 :rules="firstnameRules"
                 label="Firstname"
                 required
-              ></v-text-field>
+              >
+              </v-text-field>
 
               <v-text-field
                 v-model="formData.surname"
