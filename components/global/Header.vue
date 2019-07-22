@@ -24,8 +24,9 @@
           :key="item.title"
           router
           :to="item.route"
+          exact
         >
-          <v-list-tile-action router to="item.route">
+          <v-list-tile-action>
             <v-avatar class="mr-2" v-if="item.avatar && avatar"
             size="36px"
           >
@@ -63,6 +64,7 @@
 
       <v-toolbar-items class="hidden-xs-only">
         <v-btn
+          exact
           flat 
           v-for="item in menuItems" :key="item.title"
           router
@@ -105,7 +107,8 @@ export default {
       ]
       if (this.isLoggedIn) {
         menuItems = [
-          { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
+          { title: 'View Meetups', icon: 'supervisor_account', route: '/admin/meetups' },
+          { title: 'Add Meetup', icon: 'group_add', route: '/admin/meetups/new' },
           { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, route: '/users/' + this.$store.getters.user.id }
         ]
       }
