@@ -140,66 +140,44 @@ export const actions = {
         })
     )
   },
-  updateProfile ({ commit }, payload) {
-    console.log(payload)
-    let imageUrl = ''
-    let imageName = ''
+  updateProfile ({ commit, dispatch }, payload) {
+    // When new image uploaded
     if (payload.formData.image) {
-      // Upload image
-      console.log('image found')
+      // Upload image and update user with imgName and imgUrl
       const name = payload.formData.image.name
       const ext = name.slice(name.lastIndexOf('.'))
       const ref = fireStorage.ref('users/' + payload.userid + ext)
       return ref.put(payload.formData.image)
         .then(snapshot => {
           console.log('image uploaded')
-          imageName = snapshot.metadata.name
+          payload.formData.imgName = snapshot.metadata.name
           return snapshot.ref.getDownloadURL()
             .then(downloadURL => {
-              imageUrl = downloadURL
-              console.log('imageName imageUrl: ',imageName + '/' + imageUrl)
-              const userRef = fireDb.collection('users').doc(payload.userid)
-              const setWithMerge = userRef.set({
-                firstname: payload.formData.firstname,
-                surname: payload.formData.surname,
-                imgUrl: imageUrl,
-                imgName: imageName
-              }, { merge: true })
-            
-              return setWithMerge
-                .then(function() {
-                  payload.formData.imgUrl = imageUrl
-                  payload.formData.imgName = imageName
-                  console.log('formData.imgUrl/imgName: ', payload.formData.imgUrl + '/' + payload.formData.imgName)
-                  console.log("Document successfully written!");
-                  commit('updateUser', payload.formData)
-                  commit('clearError')
-                })
-                .catch((err) => {
-                  commit('setError', err)
-                    console.error("Error writing document: ", err);
+              payload.formData.imgUrl = downloadURL
+              dispatch('updateUser', payload)
+                .then(() => {
+                  console.log('User updated')
                 })
             })
           })
-    } else {
-      imageUrl = payload.formData.imgUrl
-      imageName = payload.formData.imgName
     }
-    console.log('imageName imageUrl: ',imageName + '/' + imageUrl)
+    // When no new image uploaded
+    dispatch('updateUser', payload)
+      .then(() => {
+        console.log('User updated')
+      })
+      .catch(err => console.error(err))
+  },
+  updateUser ({ commit }, payload) {
     const userRef = fireDb.collection('users').doc(payload.userid)
     const setWithMerge = userRef.set({
       firstname: payload.formData.firstname,
       surname: payload.formData.surname,
-      imgUrl: imageUrl,
-      imgName: imageName
+      imgUrl: payload.formData.imgUrl,
+      imgName: payload.formData.imgName
     }, { merge: true })
-  
     return setWithMerge
       .then(function() {
-        payload.formData.imgUrl = imageUrl
-        payload.formData.imgName = imageName
-        console.log('formData.imgUrl/imgName: ', payload.formData.imgUrl + '/' + payload.formData.imgName)
-        console.log("Document successfully written!");
         commit('updateUser', payload.formData)
         commit('clearError')
       })
