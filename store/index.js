@@ -4,6 +4,7 @@ import { fireAuth, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 export const state = () => ({
   user: {},
+  meetups: [],
   loading: [],
   error: null
 })
@@ -21,6 +22,9 @@ export const mutations = {
   clearUserImageFields (state) {
     state.user.imgUrl = ''
     state.user.imgName = ''
+  },
+  addMeetup (state, meetup) {
+    state.meetups.push(meetup)
   },
 
   setError (state, error) {
@@ -211,6 +215,52 @@ export const actions = {
       .catch(function(error) {
         console.log(error)
       })
+  },
+  addMeetup ({ commit }, payload) {
+    console.log('payload on addMeetup store: ', payload)
+    return fireDb.collection('meetups').add(payload.formData)
+        .then(function(docRef) {
+            console.log('Document successfully written!')
+            payload.formData.id = docRef.id
+            // Upload image if available
+            if (payload.image) {
+              console.log("enter payload.image")
+              const name = payload.image.name
+              const ext = name.slice(name.lastIndexOf('.'))
+              const ref = fireStorage.ref('meetups/' + payload.formData.id + ext)
+              return ref.put(payload.image)
+                .then(snapshot => {
+                  console.log('image uploaded')
+                  payload.formData.imgName = snapshot.metadata.name
+                  return snapshot.ref.getDownloadURL()
+                    .then(downloadURL => {
+                      payload.formData.imgUrl = downloadURL
+                      // Update meetup with uploaded image data
+                      return fireDb.collection('meetups').doc(payload.formData.id).set({
+                        imgName: payload.formData.imgName,
+                        imgUrl: payload.formData.imgUrl
+                      }, { merge: true })
+                        .then(() => {
+                          console.log('Meetup updated with image data')
+                          commit('addMeetup', payload.formData)
+                        })
+                        .catch(err => console.log(err))
+                    })
+                    .catch(err => console.log(err))
+                })
+                .catch(err => console.log(err))
+            // Add meetup when no images
+            } else {
+              console.log('enter no payload.image')
+              commit('addMeetup', payload.formData)
+            }            
+        })
+        .catch(function(error) {
+            console.error("Error writing document: ", error)
+        })
+  },
+  updateMeetup ({ commit }, formData) {
+
   },
   clearError ({ commit }) {
     commit('clearError')

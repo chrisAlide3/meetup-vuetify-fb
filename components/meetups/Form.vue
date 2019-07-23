@@ -42,13 +42,13 @@
 
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
-                  <v-btn v-if="!formData.image"
+                  <v-btn v-if="!image"
                     raised
                     color="primary"
                     @click="onPickFile"
                   >Upload image
                   </v-btn>
-                  <v-btn v-if="formData.image"
+                  <v-btn v-if="image"
                     raised
                     color="error"
                     @click="onRemoveFile"
@@ -110,6 +110,7 @@
                     color="success" 
                     depressed
                     round
+                    :loading="loading.includes('save')"
                     :disabled="!valid"
                     @click="save"
                   >Save
@@ -166,11 +167,11 @@ export default {
         description: '',
         date: new Date().toISOString().substr(0, 10),
         time: null,
-        userId: this.userId,
+        userId: this.$store.getters.user.id,
         imgName: '',
         imgUrl: '',
-        image: null
       },
+      image: null
     }
   },
   props: {
@@ -180,19 +181,23 @@ export default {
     }
   },
   computed: {
-    userId () {
-      return this.$store.getters.user.id
+    loading () {
+      return this.$store.getters.loading
     }
   },
   methods: {
     save () {
+      const payload = {
+        formData: this.formData,
+        image: this.image
+      }
       if (this.meetup & this.$refs.form.validate()) {
-        console.log('Update meetup')
+        this.$emit('updateMeetup', payload)
       } 
       if (!this.meetup & this.$refs.form.validate()) {
-        delete this.formData['imgUrl']
-        console.log('add meetup')
-        console.log(this.formData)
+        payload.formData.imgUrl = ''
+        this.$store.dispatch('loading', 'save')
+        this.$emit('addMeetup', payload)
       }
     },
     onPickFile () {
@@ -213,10 +218,10 @@ export default {
           this.formData.imgUrl = fileReader.result
         })
         fileReader.readAsDataURL(files[0])
-        this.formData.image = files[0]
+        this.image = files[0]
       },
       onRemoveFile () {
-        this.formData.image = null
+        this.image = null
         this.formData.imgName = ''
         this.formData.imgUrl = ''
       }
