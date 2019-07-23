@@ -8,15 +8,23 @@
 
 <script>
 import Form from '~/components/meetups/Form'
+import { fireDb } from '~/plugins/firebase.js'
 
 export default {
   components: {
     Form
   },
-  computed: {
-    meetup () {
-
-    }
-  }  
+  asyncData (context) {
+    const meetupId = context.params.id
+    return fireDb.collection('meetups').doc(meetupId).get()
+      .then(doc => {
+        return {
+          meetup: doc.data()
+        }
+      })
+      .catch(err => {
+        console.log('Error reading meetup')
+      })
+  }
 }
 </script>

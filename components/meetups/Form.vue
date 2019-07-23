@@ -42,13 +42,13 @@
 
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
-                  <v-btn v-if="!image"
+                  <v-btn v-if="!formData.imgName"
                     raised
                     color="primary"
                     @click="onPickFile"
                   >Upload image
                   </v-btn>
-                  <v-btn v-if="image"
+                  <v-btn v-if="formData.imgName"
                     raised
                     color="error"
                     @click="onRemoveFile"
