@@ -2,7 +2,7 @@
   <div>
     <h1>Add meetup route</h1>
     <hr>
-    <Form @addMeetup="addMeetup" @updateMeetup="updateMeetup" />
+    <Form @addMeetup="addMeetup" />
 </div>
 </template>
 
@@ -19,17 +19,10 @@ export default {
         .then(() => {
           this.$store.dispatch('clearLoading')
           if (!this.$store.getters.error) {
-            console.log('Meetup added')
             this.$router.push('/')
           } else {
             console.log('Error on adding meetup')
           }
-        })
-    },
-    updateMeetup (formData) {
-      this.$store.dispatch('updateMeetup', payload)
-        .then(() => {
-          console.log('Meetup updated')
         })
     }
   }

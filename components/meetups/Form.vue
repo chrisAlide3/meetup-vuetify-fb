@@ -49,6 +49,7 @@
                   >Upload image
                   </v-btn>
                   <v-btn v-if="formData.imgName"
+                    :loading="loading.includes('removeImage')"
                     raised
                     color="error"
                     @click="onRemoveFile"
@@ -191,40 +192,56 @@ export default {
         formData: this.formData,
         image: this.image
       }
-      if (this.meetup & this.$refs.form.validate()) {
+      if (this.meetup && this.$refs.form.validate()) {
+        if (!payload.formData.imgName) {
+          payload.formData.imgUrl = ''
+        }
+        payload.meetupId = this.$route.params.id
+        this.$store.dispatch('loading', 'save')
         this.$emit('updateMeetup', payload)
       } 
-      if (!this.meetup & this.$refs.form.validate()) {
+      if (!this.meetup && this.$refs.form.validate()) {
         payload.formData.imgUrl = ''
         this.$store.dispatch('loading', 'save')
         this.$emit('addMeetup', payload)
       }
     },
     onPickFile () {
-        this.$refs.fileInput.click()
-      },
-      onFilePicked (event) {
-        if (!event.target.files[0]) {
-          return
-        }
-        const files = event.target.files
-        const filename = files[0].name
-        if (filename.lastIndexOf('.') <= 0) {
-          return alert('Invalid file. File must have an image extension')
-        }
-        // convert picked file to baseUrl format to display preview of chosen file
-        const fileReader = new FileReader()
-        fileReader.addEventListener('load', () => {
-          this.formData.imgUrl = fileReader.result
-        })
-        fileReader.readAsDataURL(files[0])
-        this.image = files[0]
-      },
-      onRemoveFile () {
-        this.image = null
-        this.formData.imgName = ''
-        this.formData.imgUrl = ''
+      this.$refs.fileInput.click()
+    },
+    onFilePicked (event) {
+      if (!event.target.files[0]) {
+        return
       }
+      const files = event.target.files
+      const filename = files[0].name
+      if (filename.lastIndexOf('.') <= 0) {
+        return alert('Invalid file. File must have an image extension')
+      }
+      // convert picked file to baseUrl format to display preview of chosen file
+      const fileReader = new FileReader()
+      fileReader.addEventListener('load', () => {
+        this.formData.imgUrl = fileReader.result
+      })
+      fileReader.readAsDataURL(files[0])
+      this.image = files[0]
+    },
+    onRemoveFile () {
+      if (this.formData.imgName) {
+        this.$store.dispatch('loading', 'removeImage')
+        const payload = {
+          meetupId: this.$route.params.id,
+          imgName: this.formData.imgName
+        }
+        this.$store.dispatch('removeMeetupImage', payload)
+          .then(() => {
+            this.$store.dispatch('clearLoading')
+            this.image = null
+            this.formData.imgName = ''
+            this.formData.imgUrl = ''
+          })
+      }  
+    }
   }
 }
 </script>

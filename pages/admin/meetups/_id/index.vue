@@ -2,7 +2,7 @@
   <div>
     <h1>Edit meetup route</h1>
     <hr>
-    <Form :meetup="meetup"/>
+    <Form :meetup="meetup" @updateMeetup="updateMeetup"/>
   </div>
 </template>
 
@@ -25,6 +25,24 @@ export default {
       .catch(err => {
         console.log('Error reading meetup')
       })
+  },
+  computed: {
+    error () {
+      return this.$store.getters.error
+    }
+  },
+  methods: {
+    updateMeetup (payload) {
+      this.$store.dispatch('updateMeetup', payload)
+        .then(() => {
+          this.$store.dispatch('clearLoading')
+          if (!this.error) {
+            this.$router.push('/')
+          } else {
+            console.log('Meetup not updated')
+          }
+        })
+    }
   }
 }
 </script>

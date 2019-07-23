@@ -26,6 +26,19 @@ export const mutations = {
   addMeetup (state, meetup) {
     state.meetups.push(meetup)
   },
+  updateMeetup (state, formData) {
+    const index = state.meetups.findIndex(i => i.id == formData.id)
+    if (index >= 0) {
+      state.meetups[index] = formData
+    }
+  },
+  clearMeetupImageFields (state, meetupId) {
+    const index = state.meetups.findIndex(i => i.id == meetupId)
+    if (index >= 0) {
+      state.meetups[index].imgName = ''
+      state.meetups[index].imgUrl = ''
+    }
+  },
 
   setError (state, error) {
     state.error = error
@@ -190,7 +203,7 @@ export const actions = {
           console.error("Error writing document: ", err);
       })
   },
-  removeImage ({ commit }, payload) {
+  removeUserImage ({ commit }, payload) {
     // Create a reference to the file to delete
     const ref = fireStorage.ref('users/' + payload.imgName)
     // Delete the file
@@ -217,20 +230,16 @@ export const actions = {
       })
   },
   addMeetup ({ commit }, payload) {
-    console.log('payload on addMeetup store: ', payload)
     return fireDb.collection('meetups').add(payload.formData)
         .then(function(docRef) {
-            console.log('Document successfully written!')
             payload.formData.id = docRef.id
             // Upload image if available
             if (payload.image) {
-              console.log("enter payload.image")
               const name = payload.image.name
               const ext = name.slice(name.lastIndexOf('.'))
               const ref = fireStorage.ref('meetups/' + payload.formData.id + ext)
               return ref.put(payload.image)
                 .then(snapshot => {
-                  console.log('image uploaded')
                   payload.formData.imgName = snapshot.metadata.name
                   return snapshot.ref.getDownloadURL()
                     .then(downloadURL => {
@@ -241,7 +250,6 @@ export const actions = {
                         imgUrl: payload.formData.imgUrl
                       }, { merge: true })
                         .then(() => {
-                          console.log('Meetup updated with image data')
                           commit('addMeetup', payload.formData)
                         })
                         .catch(err => console.log(err))
@@ -259,8 +267,63 @@ export const actions = {
             console.error("Error writing document: ", error)
         })
   },
-  updateMeetup ({ commit }, formData) {
-
+  updateMeetup ({ commit }, payload) {
+    if (payload.image) {
+      // Image to upload
+      const name = payload.image.name
+      const ext = name.slice(name.lastIndexOf('.'))
+      const ref = fireStorage.ref('meetups/' + payload.meetupId + ext)
+      return ref.put(payload.image)
+        .then(snapshot => {
+          payload.formData.imgName = snapshot.metadata.name
+          return snapshot.ref.getDownloadURL()
+            .then(downloadURL => {
+              payload.formData.imgUrl = downloadURL
+              // Update meetup with uploaded image data
+              return fireDb.collection('meetups').doc(payload.meetupId).set(payload.formData, { merge: true })
+                .then(() => {
+                  payload.formData.id = payload.meetupId
+                  commit('updateMeetup', payload.formData)
+                })
+                .catch(err => console.log(err))
+            })
+            .catch(err => console.log(err))
+        })
+        .catch(err => console.log(err))   
+    } else {
+      // No image to upload
+      return fireDb.collection('meetups').doc(payload.meetupId).set(payload.formData, { merge: true })
+        .then(() => {
+          payload.formData.id = payload.meetupId
+          commit('updateMeetup', payload.formData)
+        })
+        .catch(err => console.log(err))
+    }
+  },
+  removeMeetupImage ({ commit }, payload) {
+    // Create a reference to the file to delete
+    const ref = fireStorage.ref('meetups/' + payload.imgName)
+    // Delete the file
+    return ref.delete()
+      .then(function() {
+        // Clear image fields on meetup
+        const userRef = fireDb.collection('meetups').doc(payload.meetupId)
+        const setWithMerge = userRef.set({
+          imgUrl: '',
+          imgName: ''
+        }, { merge: true })
+      
+        return setWithMerge
+          .then(function() {
+            commit('clearMeetupImageFields', payload.meetupId)
+          })
+          .catch((err) => {
+            console.error("Error clearing image fields: ", err);
+          })
+      })
+      .catch(function(error) {
+        console.log(error)
+      })
   },
   clearError ({ commit }) {
     commit('clearError')

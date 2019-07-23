@@ -41,7 +41,7 @@
                 <v-btn v-if="!formData.imgName == ''"
                   raised
                   color="error"
-                  :loading="loading.includes('removeImage')"
+                  :loading="loading.includes('removeUserImage')"
                   @click="onRemoveFile"
                 >Remove image
                 </v-btn>
@@ -193,8 +193,8 @@
           userid: this.user.id,
           imgName: this.formData.imgName
         }
-        this.$store.dispatch('loading', 'removeImage')
-        this.$store.dispatch('removeImage', payload)
+        this.$store.dispatch('loading', 'removeUserImage')
+        this.$store.dispatch('removeUserImage', payload)
           .then(() => {
             console.log('image deleted')
             this.formData.imgUrl = ''
