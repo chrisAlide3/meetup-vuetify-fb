@@ -13,7 +13,7 @@ export const mutations = {
   loadUser (state, user) {
     state.user = user
   },
-  logout (state) {
+  logoutUser (state) {
     this.state.user = {}
   },
   updateUser ( state, formData) {
@@ -171,8 +171,17 @@ export const actions = {
         })
     )
   },
-  logout ({ commit }) {
-    commit('logout')
+  logout ({commit}) {
+    return fireAuth.signOut()
+      .then(function() {
+        console.log('User signedOut of Firebase')
+      })
+      .catch(function(error) {
+        console.log(error)
+      })
+  },
+  logoutUser ({ commit }) {
+    commit('logoutUser')
   },
   updateProfile ({ commit, dispatch }, payload) {
     // When new image uploaded

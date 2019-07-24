@@ -22,7 +22,7 @@ export default (context => {
       }
     } else if (context.store.getters.user != ''){
       console.log('not signed in')
-      context.store.dispatch('logout')
+      context.store.dispatch('logoutUser')
     }
   })
 })
