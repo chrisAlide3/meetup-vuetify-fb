@@ -70,16 +70,7 @@
           router
           :to="item.route"
         >
-          <v-avatar class="mr-2" v-if="item.avatar && avatar"
-            size="36px"
-          >
-            <img
-              v-if="user.imgUrl"
-              :src="user.imgUrl"
-              alt="Avatar"
-            >
-          </v-avatar>
-          <v-icon left v-if="!item.avatar || item.avatar && !avatar">
+          <v-icon left>
             {{ item.icon }}
           </v-icon>
         {{ item.title }}
@@ -162,9 +153,6 @@ export default {
     }
   },
   methods: {
-    navTo() {
-
-    },
     profileMenu (item) {
       console.log('Menu item clicked: ', item)
       if (item.title === 'Edit') {
