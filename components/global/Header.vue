@@ -84,8 +84,41 @@
           </v-icon>
         {{ item.title }}
         </v-btn>
-      </v-toolbar-items>
+        <!-- Dropdown menu for Profile -->
+        <v-menu offset-y v-if="this.$store.getters.user != ''">
+          <v-btn
+            slot="activator"
+            flat
+            dark
+          >
+            <v-avatar class="mr-2" v-if="this.user.imgUrl"
+              size="36px"
+            >
+              <img
+                :src="user.imgUrl"
+                alt="Avatar"
+              >
+            </v-avatar>
+            <v-icon left v-else>
+              person
+            </v-icon>
+              Profile
+            <v-icon class="ml-2">
+              expand_more
+            </v-icon>
+          </v-btn>
+          <v-list>
+            <v-list-tile
+              v-for="(item, index) in profileItems"
+              :key="index"
+              @click="profileMenu(item)"
+            >
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
 
+      </v-toolbar-items>
     </v-toolbar>
 
   </nav>
@@ -95,7 +128,11 @@
 export default {
   data () {
     return {
-      drawer: false
+      drawer: false,
+      profileItems: [
+        { title: 'Edit' },
+        { title: 'Logout' },
+      ],
     }
   },
   computed: {
@@ -109,7 +146,7 @@ export default {
         menuItems = [
           { title: 'View Meetups', icon: 'supervisor_account', route: '/admin/meetups' },
           { title: 'Add Meetup', icon: 'group_add', route: '/admin/meetups/new' },
-          { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, route: '/users/' + this.$store.getters.user.id }
+          // { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, route: '/users/' + this.$store.getters.user.id }
         ]
       }
       return menuItems
@@ -127,6 +164,18 @@ export default {
   methods: {
     navTo() {
 
+    },
+    profileMenu (item) {
+      console.log('Menu item clicked: ', item)
+      if (item.title === 'Edit') {
+        this.$router.push('/users/' + this.$store.getters.user.id )
+      }
+      if (item.title === 'Logout') {
+        this.$store.dispatch('logout')
+          .then(() => {
+            this.$router.push('/')
+          })
+      }
     }
   }
 }
