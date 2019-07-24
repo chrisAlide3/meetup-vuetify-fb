@@ -5,7 +5,7 @@ export default (context => {
     // console.log('context: ', context)
     if (user) {
       // Set state user object
-      if (!context.store.getters.user) {
+      if (context.store.getters.user == '') {
         let signedInUser = ''
         const authId = user.uid
         return fireDb.collection('users').where('authid', "==", authId).get()
@@ -19,9 +19,8 @@ export default (context => {
           .catch(function(error) {
               console.log("Error getting documents: ", error);
           })      
-
       }
-    } else if (context.store.getters.user){
+    } else if (context.store.getters.user != ''){
       console.log('not signed in')
       context.store.dispatch('logout')
     }

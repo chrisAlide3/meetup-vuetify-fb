@@ -3,7 +3,7 @@ import { fireAuth, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 
 export const state = () => ({
-  user: null,
+  user: '',
   meetups: [],
   loading: [],
   error: null
@@ -361,7 +361,7 @@ export const getters = {
     return state.user
   },
   isLoggedIn (state) {
-    if (state.user) {
+    if (state.user.id) {
       return true
     } else {
       return false
