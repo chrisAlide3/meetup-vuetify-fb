@@ -36,6 +36,7 @@ export default {
   */
   plugins: [
     '~plugins/firebase.js',
+    '~plugins/firebaseAuth.js',
     '~plugins/core-components.js'
   ],
   /*

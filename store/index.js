@@ -3,7 +3,7 @@ import { fireAuth, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 
 export const state = () => ({
-  user: {},
+  user: '',
   meetups: [],
   loading: [],
   error: null
@@ -12,6 +12,9 @@ export const state = () => ({
 export const mutations = {
   loadUser (state, user) {
     state.user = user
+  },
+  logout (state) {
+    this.state.user = {}
   },
   updateUser ( state, formData) {
     state.user.firstname = formData.firstname
@@ -56,6 +59,17 @@ export const mutations = {
 }
 
 export const actions = {
+  nuxtServerInit (vuexContext, serverContext) {
+    const user = fireAuth.currentUser;
+    if (user) {
+      console.log('Server user signedIn as: ', user)
+      // User is signed in.
+    } else {
+      console.log('server user not signed in')
+      // No user is signed in.
+    }
+    return true
+  },
   register ({ commit }, formData) {
     let key = ''
     let imageUrl = ''
@@ -156,6 +170,9 @@ export const actions = {
           console.error(err)
         })
     )
+  },
+  logout ({ commit }) {
+    commit('logout')
   },
   updateProfile ({ commit, dispatch }, payload) {
     // When new image uploaded
