@@ -1,20 +1,17 @@
 <template>
-  <v-layout
-    column
+  <v-layout column
     justify-center
     align-center
   >
-    <v-flex
-      xs12
-      sm8
-      md6
-    >
-      <h1 class="text-xs-center">
-        Homepage
-      </h1>
-      <div class="text-xs-center">
-        Carrousel
-      </div>
+    <v-flex xs12 sm8 md6>
+      
+      <v-carousel interval="3000">
+          <v-carousel-item v-for="(meetup,i) in meetups" :key="i"
+            :src="meetup.imgUrl"
+          >
+        </v-carousel-item>        
+      </v-carousel>
+      
       <div class="text-xs-center">
         Meetup description
       </div>
@@ -44,6 +41,10 @@
 <script>
 
 export default {
-
+  computed: {
+    meetups () {
+      return this.$store.getters.meetups
+    }
+  }
 }
 </script>

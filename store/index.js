@@ -26,6 +26,10 @@ export const mutations = {
     state.user.imgUrl = ''
     state.user.imgName = ''
   },
+  loadMeetups (state, meetups) {
+    console.log('commit meetups: ', meetups)
+    state.meetups = meetups
+  },
   addMeetup (state, meetup) {
     state.meetups.push(meetup)
   },
@@ -60,15 +64,22 @@ export const mutations = {
 
 export const actions = {
   nuxtServerInit (vuexContext, serverContext) {
-    const user = fireAuth.currentUser;
-    if (user) {
-      console.log('Server user signedIn as: ', user)
-      // User is signed in.
-    } else {
-      console.log('server user not signed in')
-      // No user is signed in.
-    }
-    return true
+    // Read meetups
+    let meetups = []
+    return fireDb.collection("meetups").get()
+    .then(function(querySnapshot) {
+      querySnapshot.forEach(function(doc) {
+          // doc.data() is never undefined for query doc snapshots
+          // console.log(doc.id, " => ", doc.data())
+          meetups.push({...doc.data(), id: doc.id})
+      })
+      console.log('vuexContext: ', meetups)
+      serverContext.app.store.commit('loadMeetups', meetups)
+    })
+    .catch(function(error) {
+        console.log("Error getting documents: ", error);
+    })
+    
   },
   register ({ commit }, formData) {
     let key = ''
@@ -370,6 +381,9 @@ export const getters = {
   },
   user (state) {
     return state.user
+  },
+  meetups (state) {
+    return state.meetups
   },
   isLoggedIn (state) {
     if (state.user.id) {
