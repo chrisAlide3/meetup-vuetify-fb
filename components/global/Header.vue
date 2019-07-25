@@ -18,23 +18,57 @@
 
       <v-divider />
 
-      <v-list dense class="pt-0">
-        <v-list-tile
-          v-for="item in menuItems"
-          :key="item.title"
+      <v-list
+        v-for="item in menuItems"
+        :key="item.title" dense class="pt-0">
+        <!-- Expandable when subItems available -->
+        <v-list-group v-if="item.subItems" no-action>
+          <template v-slot:activator>
+            <v-list-tile>
+              <v-list-tile-action>
+                <v-avatar v-if="item.avatar && user.imgUrl"
+                  class="mr-2"
+                  size="36px"
+                >
+                  <img
+                    :src="user.imgUrl"
+                    alt="Avatar"
+                  >
+                </v-avatar>
+                <v-icon v-else>
+                  {{ item.icon }}
+                </v-icon>
+              </v-list-tile-action>
+
+              <v-list-tile-content>
+                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+          </template>
+
+          <v-list-tile
+            v-for="subItem in item.subItems"
+            :key="subItem.title"
+            router
+            :to="subItem.route"
+            exact
+            @click="profileMenu(subItem)"
+          >
+            <v-list-tile-action>
+              <v-icon>{{ subItem.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list-group>
+        <!-- Normal links when no subItems -->
+        <v-list-tile v-else
           router
           :to="item.route"
           exact
         >
           <v-list-tile-action>
-            <v-avatar class="mr-2" v-if="item.avatar && user.imgUrl"
-            size="36px"
-          >
-            <img
-              :src="user.imgUrl"
-              alt="Avatar"
-            >
-          </v-avatar>
             <v-icon v-if="!item.avatar">
               {{ item.icon }}
             </v-icon>
@@ -43,9 +77,9 @@
           <v-list-tile-content>
             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile-content>
-
         </v-list-tile>
       </v-list>
+
     </v-navigation-drawer>
 
     <!-- Toolbar -->
@@ -101,6 +135,9 @@
             <v-list-tile
               v-for="(item, index) in item.subItems"
               :key="index"
+              router
+              :to="item.route"
+              exact
               @click="profileMenu(item)"
             >
               <v-list-tile-title>{{ item.title }}</v-list-tile-title>
@@ -133,8 +170,8 @@ export default {
           { title: 'View Meetups', icon: 'supervisor_account', route: '/admin/meetups' },
           { title: 'Add Meetup', icon: 'group_add', route: '/admin/meetups/new' },
           { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, subItems: [
-              { title: 'Edit' }, 
-              { title: 'Logout' }
+              { title: 'Edit', icon: 'edit', route: '/users/' + this.$store.getters.user.id  }, 
+              { title: 'Logout', icon: 'arrow_back' }
             ]
           }
         ]
@@ -153,10 +190,6 @@ export default {
   },
   methods: {
     profileMenu (item) {
-      console.log('Menu item clicked: ', item)
-      if (item.title === 'Edit') {
-        this.$router.push('/users/' + this.$store.getters.user.id )
-      }
       if (item.title === 'Logout') {
         this.$store.dispatch('logout')
           .then(() => {
