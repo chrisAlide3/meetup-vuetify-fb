@@ -2,7 +2,6 @@ import { fireAuth, fireDb } from '~/plugins/firebase.js'
 
 export default (context => {
   fireAuth.onAuthStateChanged(function(user) {
-    // console.log('context: ', context)
     if (user) {
       // Set state user object
       if (context.store.getters.user == '') {
@@ -21,7 +20,6 @@ export default (context => {
           })      
       }
     } else if (context.store.getters.user != ''){
-      console.log('not signed in')
       context.store.dispatch('logoutUser')
     }
   })
