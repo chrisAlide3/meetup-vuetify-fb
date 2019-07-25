@@ -14,7 +14,7 @@ export const mutations = {
     state.user = user
   },
   logoutUser (state) {
-    this.state.user = {}
+    this.state.user = ''
   },
   updateUser ( state, formData) {
     state.user.firstname = formData.firstname
@@ -64,6 +64,7 @@ export const mutations = {
 
 export const actions = {
   nuxtServerInit (vuexContext, serverContext) {
+    console.log('nuxtServerInit')
     // Read meetups
     let meetups = []
     return fireDb.collection("meetups").get()
@@ -73,7 +74,6 @@ export const actions = {
           // console.log(doc.id, " => ", doc.data())
           meetups.push({...doc.data(), id: doc.id})
       })
-      console.log('vuexContext: ', meetups)
       serverContext.app.store.commit('loadMeetups', meetups)
     })
     .catch(function(error) {
@@ -161,21 +161,21 @@ export const actions = {
       .then(res => {
         console.log('user signed in on firebase')
         // Read userdata with authid
-        let user = {}
-        const usersRef = fireDb.collection("users")
-        const query =  usersRef.where("authid", "==", res.user.uid)
-         return query.get()
-          .then(function (querySnapshot) {
-            querySnapshot.forEach(function (doc) {
-              user = {...doc.data(), id: doc.id}
-            })
-            commit('clearError')
-            commit('loadUser', user)
-          })
-          .catch(err => {
-            commit('setError', err)
-            console.error(err)
-          })
+        // let user = {}
+        // const usersRef = fireDb.collection("users")
+        // const query =  usersRef.where("authid", "==", res.user.uid)
+        //  return query.get()
+        //   .then(function (querySnapshot) {
+        //     querySnapshot.forEach(function (doc) {
+        //       user = {...doc.data(), id: doc.id}
+        //     })
+        //     commit('clearError')
+        //     commit('loadUser', user)
+        //   })
+        //   .catch(err => {
+        //     commit('setError', err)
+        //     console.error(err)
+        //   })
 
         })
         .catch(err => {
