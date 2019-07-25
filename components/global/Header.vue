@@ -27,16 +27,15 @@
           exact
         >
           <v-list-tile-action>
-            <v-avatar class="mr-2" v-if="item.avatar && avatar"
+            <v-avatar class="mr-2" v-if="item.avatar && user.imgUrl"
             size="36px"
           >
             <img
-              v-if="user.imgUrl"
               :src="user.imgUrl"
               alt="Avatar"
             >
           </v-avatar>
-            <v-icon v-if="!item.avatar || item.avatar && !avatar">
+            <v-icon v-if="!item.avatar">
               {{ item.icon }}
             </v-icon>
           </v-list-tile-action>
@@ -44,6 +43,7 @@
           <v-list-tile-content>
             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile-content>
+
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
@@ -62,11 +62,10 @@
 
       <v-spacer />
 
-      <v-toolbar-items class="hidden-xs-only">
-        <v-btn
+      <v-toolbar-items v-for="item in menuItems" :key="item.title" class="hidden-xs-only">
+        <v-btn v-if="!item.subItems"
           exact
           flat 
-          v-for="item in menuItems" :key="item.title"
           router
           :to="item.route"
         >
@@ -76,13 +75,13 @@
         {{ item.title }}
         </v-btn>
         <!-- Dropdown menu for Profile -->
-        <v-menu offset-y v-if="this.$store.getters.user != ''">
+        <v-menu v-if="item.subItems" offset-y >
           <v-btn
             slot="activator"
             flat
             dark
           >
-            <v-avatar class="mr-2" v-if="this.user.imgUrl"
+            <v-avatar class="mr-2" v-if="user.imgUrl"
               size="36px"
             >
               <img
@@ -100,7 +99,7 @@
           </v-btn>
           <v-list>
             <v-list-tile
-              v-for="(item, index) in profileItems"
+              v-for="(item, index) in item.subItems"
               :key="index"
               @click="profileMenu(item)"
             >
@@ -120,10 +119,6 @@ export default {
   data () {
     return {
       drawer: false,
-      profileItems: [
-        { title: 'Edit' },
-        { title: 'Logout' },
-      ],
     }
   },
   computed: {
@@ -137,7 +132,11 @@ export default {
         menuItems = [
           { title: 'View Meetups', icon: 'supervisor_account', route: '/admin/meetups' },
           { title: 'Add Meetup', icon: 'group_add', route: '/admin/meetups/new' },
-          // { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, route: '/users/' + this.$store.getters.user.id }
+          { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, subItems: [
+              { title: 'Edit' }, 
+              { title: 'Logout' }
+            ]
+          }
         ]
       }
       return menuItems
