@@ -1,9 +1,9 @@
 <template>
-  <v-layout column
+  <v-layout row
     justify-center
     align-center
   >
-    <v-flex xs12 sm8 md6>
+    <v-flex xs12 sm10>
       
       <v-carousel interval="3000">
           <v-carousel-item v-for="(meetup,i) in meetups" :key="i"

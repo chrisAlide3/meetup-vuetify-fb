@@ -18,66 +18,68 @@
 
       <v-divider />
 
-      <v-list
-        v-for="item in menuItems"
-        :key="item.title" dense class="pt-0">
+      <v-list dense class="pt-0">
         <!-- Expandable when subItems available -->
-        <v-list-group v-if="item.subItems" no-action>
-          <template v-slot:activator>
-            <v-list-tile>
-              <v-list-tile-action>
-                <v-avatar v-if="item.avatar && user.imgUrl"
-                  class="mr-2"
-                  size="36px"
-                >
-                  <img
-                    :src="user.imgUrl"
-                    alt="Avatar"
+        <template v-for="item in menuItems">
+          <v-list-group v-if="item.subItems" :key="item.title" no-action>
+            <template v-slot:activator>
+              <v-list-tile>
+                <v-list-tile-action>
+                  <v-avatar v-if="item.avatar && user.imgUrl"
+                    class="mr-2"
+                    size="36px"
                   >
-                </v-avatar>
-                <v-icon v-else>
-                  {{ item.icon }}
-                </v-icon>
-              </v-list-tile-action>
+                    <img
+                      :src="user.imgUrl"
+                      alt="Avatar"
+                    >
+                  </v-avatar>
+                  <v-icon v-else>
+                    {{ item.icon }}
+                  </v-icon>
+                </v-list-tile-action>
 
-              <v-list-tile-content>
-                <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-          </template>
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </template>
 
-          <v-list-tile
-            v-for="subItem in item.subItems"
-            :key="subItem.title"
+            <template v-for="subItem in item.subItems">
+              <v-list-tile
+                :key="subItem.title"
+                router
+                :to="subItem.route"
+                exact
+                @click="profileMenu(subItem)"
+              >
+                <v-list-tile-action>
+                  <v-icon>{{ subItem.icon }}</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+            </template>
+          </v-list-group>
+        <!-- Normal links when no subItems -->
+          <v-list-tile v-else
+            :key="item.title"
             router
-            :to="subItem.route"
+            :to="item.route"
             exact
-            @click="profileMenu(subItem)"
           >
             <v-list-tile-action>
-              <v-icon>{{ subItem.icon }}</v-icon>
+              <v-icon v-if="!item.avatar">
+                {{ item.icon }}
+              </v-icon>
             </v-list-tile-action>
+
             <v-list-tile-content>
-              <v-list-tile-title>{{ subItem.title }}</v-list-tile-title>
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
             </v-list-tile-content>
           </v-list-tile>
-        </v-list-group>
-        <!-- Normal links when no subItems -->
-        <v-list-tile v-else
-          router
-          :to="item.route"
-          exact
-        >
-          <v-list-tile-action>
-            <v-icon v-if="!item.avatar">
-              {{ item.icon }}
-            </v-icon>
-          </v-list-tile-action>
-
-          <v-list-tile-content>
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
+        </template>
       </v-list>
 
     </v-navigation-drawer>
@@ -96,58 +98,61 @@
 
       <v-spacer />
 
-      <v-toolbar-items v-for="item in menuItems" :key="item.title" class="hidden-xs-only">
-        <v-btn v-if="!item.subItems"
-          exact
-          flat 
-          router
-          :to="item.route"
-        >
-          <v-icon left>
-            {{ item.icon }}
-          </v-icon>
-        {{ item.title }}
-        </v-btn>
-        <!-- Dropdown menu for Profile -->
-        <v-menu v-if="item.subItems" offset-y >
-          <v-btn
-            slot="activator"
-            flat
-            dark
+      <v-toolbar-items class="hidden-xs-only">
+        <template v-for="item in menuItems">
+          <v-btn v-if="!item.subItems"
+            :key="item.title"
+            exact
+            flat 
+            router
+            :to="item.route"
           >
-            <v-avatar class="mr-2" v-if="user.imgUrl"
-              size="36px"
-            >
-              <img
-                :src="user.imgUrl"
-                alt="Avatar"
-              >
-            </v-avatar>
-            <v-icon left v-else>
-              person
+            <v-icon left>
+              {{ item.icon }}
             </v-icon>
-              Profile
-            <v-icon class="ml-2">
-              expand_more
-            </v-icon>
+          {{ item.title }}
           </v-btn>
-          <v-list>
-            <v-list-tile
-              v-for="(item, index) in item.subItems"
-              :key="index"
-              router
-              :to="item.route"
-              exact
-              @click="profileMenu(item)"
+          <!-- Dropdown menu for Profile -->
+          <v-menu v-if="item.subItems" :key="item.title" offset-y >
+            <v-btn
+              slot="activator"
+              flat
+              dark
             >
-              <v-list-tile-action>
-                <v-icon>{{ item.icon }}</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-            </v-list-tile>
-          </v-list>
-        </v-menu>
-
+              <v-avatar class="mr-2" v-if="user.imgUrl"
+                size="36px"
+              >
+                <img
+                  :src="user.imgUrl"
+                  alt="Avatar"
+                >
+              </v-avatar>
+              <v-icon left v-else>
+                person
+              </v-icon>
+                Profile
+              <v-icon class="ml-2">
+                expand_more
+              </v-icon>
+            </v-btn>
+            <v-list>
+              <template v-for="(item, index) in item.subItems">
+                <v-list-tile
+                  :key="index"
+                  router
+                  :to="item.route"
+                  exact
+                  @click="profileMenu(item)"
+                >
+                  <v-list-tile-action>
+                    <v-icon>{{ item.icon }}</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+              </template>
+            </v-list>
+          </v-menu>
+        </template>
       </v-toolbar-items>
     </v-toolbar>
 
