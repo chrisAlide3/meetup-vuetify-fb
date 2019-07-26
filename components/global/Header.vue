@@ -175,7 +175,8 @@ export default {
       ]
       if (this.isLoggedIn) {
         menuItems = [
-          { title: 'View Meetups', icon: 'supervisor_account', route: '/admin/meetups' },
+          { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
+          { title: 'My Meetups', icon: 'person_pin_circle', route: '/admin/meetups' },
           { title: 'Add Meetup', icon: 'group_add', route: '/admin/meetups/new' },
           { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, subItems: [
               { title: 'Edit', icon: 'edit', route: '/users/' + this.$store.getters.user.id  }, 
