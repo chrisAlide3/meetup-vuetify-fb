@@ -1,18 +1,31 @@
 <template>
   <div>
-    <h1>
-      Meetup detail route
-    </h1>
-    <Form />
+    <Detail :meetup="meetup" />
   </div>
 </template>
 
 <script>
-import Form from '@/components/meetups/Form'
+import Detail from '@/components/meetups/Detail'
+import { fireDb } from '@/plugins/firebase.js'
 
 export default {
   components: {
-    Form
+    Detail
+  },
+  asyncData (context) {
+    return fireDb.collection("meetups").doc(context.params.id).get()
+      .then(doc => {
+        if (doc.exists) {
+          return {
+            meetup: {...doc.data(), id: doc.id}
+          }
+        } else {
+          console.log('Meetup not found')
+        }
+      })
+      .catch(err => {
+        console.error('Error reading meetup')
+      })
   }
 }
 </script>

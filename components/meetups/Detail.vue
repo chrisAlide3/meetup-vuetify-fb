@@ -1,7 +1,7 @@
 <template>
   <v-layout row justify-center>
     <v-flex xs12 sm8 md6>
-      <v-card v-for="meetup in meetups" :key="meetup.title" class="mb-3">
+      <v-card>
         <v-img
           :src="meetup.imgUrl"
           aspect-ratio="2.75"
@@ -24,7 +24,7 @@
           </v-flex>
 
           <v-card-actions>
-            <v-btn flat color="primary" @click="$router.push('/meetups/' + meetup.id)">Detail</v-btn>
+            <v-btn flat color="orange">Share</v-btn>
             <v-btn flat color="orange">Explore</v-btn>
           </v-card-actions>
         </v-layout>
@@ -34,19 +34,12 @@
 </template>
 
 <script>
-import List from '@/components/meetups/List'
-
 export default {
-  components: {
-    List
-  },
-  computed: {
-    isLoggedIn () {
-      return this.$store.getters.isLoggedIn
-    },
-    meetups () {
-      return this.$store.getters.meetups
+  props: {
+    meetup: {
+      type: Object,
+      required: true
     }
-  }
+  },
 }
 </script>
