@@ -30,6 +30,7 @@ export default {
   ** Global CSS
   */
   css: [
+    '~/assets/style/main.css'
   ],
   /*
   ** Plugins to load before mounting the App
@@ -37,7 +38,8 @@ export default {
   plugins: [
     '~plugins/firebase.js',
     '~plugins/firebaseAuth.js',
-    '~plugins/core-components.js'
+    '~plugins/core-components.js',
+    '~plugins/date-filter.js'
   ],
   /*
   ** Nuxt.js modules
