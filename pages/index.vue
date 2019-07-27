@@ -3,24 +3,24 @@
     <v-layout row class="mb-3"
       justify-center
     >
-        <v-btn
-          round
-          class="secondary"
-          @click="$router.push('/meetups')"  
-        >
-          <v-icon left>supervisor_account</v-icon>
-        View meetups
-        </v-btn>
-        <v-btn
-          round
-          class="secondary"
-          @click="$router.push('/admin/meetups/new')"   
-        >
-          <v-icon left>group_add</v-icon>
-        Add meetup
-        </v-btn>
+      <v-btn
+        round
+        class="secondary"
+        @click="$router.push('/meetups')"  
+      >
+        <v-icon left>supervisor_account</v-icon>
+      View meetups
+      </v-btn>
+      <v-btn
+        round
+        class="secondary"
+        @click="$router.push('/admin/meetups/new')"   
+      >
+        <v-icon left>group_add</v-icon>
+      Add meetup
+      </v-btn>
     </v-layout>
-    
+
     <v-layout row
       justify-center
     >
