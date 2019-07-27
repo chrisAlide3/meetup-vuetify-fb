@@ -1,10 +1,31 @@
 <template>
-  <v-container>
+  <div>
+    <v-layout row class="mb-3"
+      justify-center
+    >
+        <v-btn
+          round
+          class="secondary"
+          @click="$router.push('/meetups')"  
+        >
+          <v-icon left>supervisor_account</v-icon>
+        View meetups
+        </v-btn>
+        <v-btn
+          round
+          class="secondary"
+          @click="$router.push('/admin/meetups/new')"   
+        >
+          <v-icon left>group_add</v-icon>
+        Add meetup
+        </v-btn>
+    </v-layout>
+    
     <v-layout row
       justify-center
     >
       <v-flex xs12 sm10>    
-        <v-carousel interval="5000">
+        <v-carousel interval="5000"  height="350px">
           <v-carousel-item v-for="(meetup,i) in meetups" :key="i"
             :src="meetup.imgUrl"
           >
@@ -49,7 +70,7 @@
           </v-btn>
       </v-flex>
     </v-layout>
-  </v-container>
+  </div>
 </template>
 
 <script>
