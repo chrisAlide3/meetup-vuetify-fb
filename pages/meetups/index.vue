@@ -1,33 +1,45 @@
 <template>
   <v-layout row justify-center>
-    <v-flex xs12 sm8 md6>
-      <v-card v-for="meetup in meetups" :key="meetup.title" class="mb-3">
-        <v-img
-          :src="meetup.imgUrl"
-          aspect-ratio="2.75"
-        ></v-img>
+    <v-flex xs12 sm8>
+      <v-card>
+        <v-container fluid>
+          <v-layout
+            row
+            fill-height
+            v-for="meetup in meetups"
+            :key="meetup.title"
+            class="mb-2"  
+          >
+              <v-flex xs5 sm4 md3>
+                <v-layout column fill-height>
+                  <v-img
+                  :src="meetup.imgUrl"
+                  height="120px"
+                  >
+                  <div class="caption red--text darken-2 font-weight-bold ml-2">{{ meetup.location }}</div>
+                  </v-img>
+                </v-layout>
+              </v-flex>
 
-        <v-layout column align-center>
-          <v-flex>
-            <v-card-title primary-title class="text-xs-center">
-              <div>
-                <h3 class="headline mb-0">{{ meetup.title }}</h3>
-                <div class="caption grey--text lighten-1">{{ meetup.location }}</div>
-              </div>
-            </v-card-title>
-          </v-flex>
-
-          <v-flex>
-            <v-card-text>
-              {{ meetup.description }}
-            </v-card-text>
-          </v-flex>
-
-          <v-card-actions>
-            <v-btn flat color="primary" @click="$router.push('/meetups/' + meetup.id)">Detail</v-btn>
-            <v-btn flat color="orange">Explore</v-btn>
-          </v-card-actions>
-        </v-layout>
+              <v-flex xs7 sm8 md9>
+                <v-layout column fill-height justify-space-between>                    
+                    <div class="title ml-2 mt-1">{{ meetup.title }}</div>
+                    <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }}</div>
+                    <v-card-actions>
+                      <v-btn
+                        color="primary"
+                        flat small
+                        @click="detail(meetup.id)"
+                      >
+                        <v-icon left light>arrow_forward</v-icon>
+                      Detail 
+                      </v-btn>
+                    </v-card-actions>
+                </v-layout>
+              </v-flex>
+              
+          </v-layout>
+        </v-container>
       </v-card>
     </v-flex>
   </v-layout>
@@ -47,6 +59,18 @@ export default {
     meetups () {
       return this.$store.getters.meetups
     }
+  },
+  methods: {
+    detail (id) {
+      this.$router.push('/meetups/' + id)
+    }
   }
 }
 </script>
+
+<style scoped>
+.row {
+  border-bottom: 0.5px solid lightgray;
+  padding-bottom: 10px
+}
+</style>
