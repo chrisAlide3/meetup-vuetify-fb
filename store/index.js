@@ -27,7 +27,6 @@ export const mutations = {
     state.user.imgName = ''
   },
   loadMeetups (state, meetups) {
-    console.log('commit meetups: ', meetups)
     state.meetups = meetups
   },
   addMeetup (state, meetup) {
@@ -75,6 +74,25 @@ export const actions = {
           meetups.push({...doc.data(), id: doc.id})
       })
       serverContext.app.store.commit('loadMeetups', meetups)
+      // Load userData
+      let signedInUser = ''
+      const authId = serverContext.app.$cookies.get('userId')
+      if (authId != undefined) {
+        return fireDb.collection('users').where('authid', "==", authId).get()
+          .then(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                // doc.data() is never undefined for query doc snapshots
+                signedInUser = {...doc.data(), id: doc.id}
+              })
+            serverContext.app.store.commit('loadUser', signedInUser)
+          })
+          .catch(function(error) {
+              console.log("Error getting documents: ", error);
+          })
+      } else {
+        return signedInUser
+      }
+      
     })
     .catch(function(error) {
         console.log("Error getting documents: ", error);
