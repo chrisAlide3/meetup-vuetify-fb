@@ -1,24 +1,31 @@
 <template>
-  <div>
-    <v-layout row class="mb-3"
+  <v-container>
+    <v-layout row xs12 sm10
+      class="mb-3"
       justify-center
     >
-      <v-btn
+      <v-flex shrink>
+        <v-btn
         round
         class="secondary"
         @click="$router.push('/meetups')"  
-      >
-        <v-icon left>supervisor_account</v-icon>
-      View meetups
-      </v-btn>
-      <v-btn
+        >
+          <v-icon left>supervisor_account</v-icon>
+        View meetups
+        </v-btn>
+      </v-flex>
+      
+      <v-flex shrink>
+        <v-btn v-if="isLoggedIn"
         round
         class="secondary"
         @click="$router.push('/admin/meetups/new')"   
-      >
-        <v-icon left>group_add</v-icon>
-      Add meetup
-      </v-btn>
+        >
+          <v-icon left>group_add</v-icon>
+        Add meetup
+        </v-btn>
+      </v-flex>
+      
     </v-layout>
 
     <v-layout row
@@ -70,7 +77,7 @@
           </v-btn>
       </v-flex>
     </v-layout>
-  </div>
+  </v-container>
 </template>
 
 <script>
