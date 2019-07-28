@@ -61,6 +61,7 @@
 
 <script>
 import List from '@/components/meetups/List'
+import setMeetupStatus from '@/plugins/setMeetupStatus.js'
 
 export default {
   components: {
@@ -69,7 +70,7 @@ export default {
   created () {
     console.log('createdHook')
     for (let meetup of this.meetups) {
-      this.chipData.push(this.setChipData({id: meetup.id, date: meetup.date}))
+      this.chipData.push(this.setChipData({id: meetup.id, date: meetup.date, time: meetup.time}))
     }    
   },
   data () {
@@ -95,32 +96,7 @@ export default {
       this.$router.push('/meetups/' + id)
     },
     setChipData (meetup) {
-      let chipData = {}
-      const now = new Date()
-      let nowPlusOne = now
-      nowPlusOne.setDate(now.getDate() + 1)
-      const d = now.getDate()
-      console.log(d)
-      const meetupDate = new Date(meetup.date)
-      if (meetupDate < now) {
-        return chipData = {
-          id: meetup.id,
-          color: 'error',
-          text: 'Closed'
-        }
-        } else if (meetupDate == nowPlusOne) {
-          return chipData = {
-            id: meetup.id,
-            color: 'amber',
-            text: 'Hurry!',
-          }
-        } else {
-          return chipData = {
-            id: meetup.id,
-            color: 'success',
-            text: 'Open',
-          }
-        }
+      return setMeetupStatus(meetup)
     },
     getChipData (id) {
       return this.chipData.filter(e => {
