@@ -1,9 +1,18 @@
 import { fireAuth, fireDb } from '~/plugins/firebase.js'
 
 export default (context => {
+  console.log('Context: ', context)
   fireAuth.onAuthStateChanged(function(user) {
     if (user) {
       console.log('plugin firebaseAuth SignedIn')
+      // Set userid cookies
+      if (context.app.$cookies.get('userId') != undefined) {
+        context.app.$cookies.remove("userId")
+      }
+      context.app.$cookies.set('userId', user.uid, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365
+      })
       // Set state user object
       if (context.store.getters.user == '') {
         let signedInUser = ''
@@ -22,6 +31,10 @@ export default (context => {
       }
     } else if (context.store.getters.user != ''){
       console.log('plugin firebaseAuth SignedOut')
+      // Remove cookie
+      if (context.app.$cookies.get('userId') != undefined) {
+        context.app.$cookies.remove("userId")
+      }
       context.store.dispatch('logoutUser')
     }
   })
