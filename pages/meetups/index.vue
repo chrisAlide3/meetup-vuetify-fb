@@ -24,7 +24,7 @@
               <v-flex xs7 sm8 md7>
                 <v-layout column fill-height justify-space-between>                    
                     <div class="title ml-2 mt-1">{{ meetup.title }}</div>
-                    <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }} at {{ meetup.time }}</div>
+                    <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }} {{ meetup.time == null ?'' :'at '+meetup.time }}</div>
                     <v-card-actions>
                       <v-btn
                         color="primary"
@@ -44,7 +44,7 @@
                     <v-chip
                       small 
                       :color="getChipData(meetup.id)[0].color"
-                      text-color="white"
+                      :text-color="getChipData(meetup.id)[0].textColor"
                     >
                     {{ getChipData(meetup.id)[0].text }}
                     </v-chip>

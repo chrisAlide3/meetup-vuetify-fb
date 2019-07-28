@@ -31,25 +31,29 @@ export default (meetup) => {
     return chipData = {
       id: meetup.id,
       color: 'error',
-      text: 'Ended'
+      text: 'Ended',
+      textColor: 'white'
     }
     } else if (meetupDateWithoutTime.getTime() == nowWithoutTime.getTime()) {
       return chipData = {
         id: meetup.id,
         color: 'orange',
         text: 'Ends Today!',
+        textColor: 'white' 
       }
     } else if (meetupDateWithoutTime.getTime() == nowPlusOneDay.getTime()) {
       return chipData = {
         id: meetup.id,
-        color: 'yellow darken-2',
-        text: 'Ends Tomorrow!',
+        color: 'yellow',
+        text: 'Ends Soon!',
+        textColor: 'grey'
       }
     } else {
       return chipData = {
         id: meetup.id,
         color: 'success',
         text: 'Open',
+        textColor: 'white'
       }
     }
 }
