@@ -1,5 +1,5 @@
 <template>
-  <v-container>
+  <div>
     <v-layout row xs12 sm10
       class="mb-3"
       justify-center
@@ -36,7 +36,7 @@
           <v-carousel-item v-for="(meetup,i) in meetups" :key="i"
             :src="meetup.imgUrl"
           >
-            <h1 class="text-xs-center amber--text" :key="meetup.title">{{ meetup.location }}</h1>
+            <h1 class="text-xs-center red--text darken-2 font-weight-black" :key="meetup.title">{{ meetup.location }}</h1>
           </v-carousel-item>                        
         </v-carousel>
       </v-flex>
@@ -50,34 +50,37 @@
       </v-flex>
     </v-layout>
 
-    <v-layout row text-xs-center>
-      <v-flex xs12 sm10>
+    <v-layout row xs12 sm10 justify-space-around>
+      <v-flex shrink>
         <v-btn v-if="!isLoggedIn"
             round
             depressed
-            color="success"
+            color="primary"
             @click="$router.push('/auth/?isLogin=true')"
           >
-            <v-icon small left>
-              account_box
+            <v-icon left>
+              exit_to_app
             </v-icon>
             <span>Login</span>
           </v-btn>
+      </v-flex>
 
-          <v-btn v-if="!isLoggedIn"
+      <v-flex shrink>
+        <v-btn v-if="!isLoggedIn"
             round
             depressed
-            color="primary"
+            color="secondary"
             @click="$router.push('/auth/')"
           >
-            <v-icon small left>
-              perm_identity
+            <v-icon left>
+              account_circle
             </v-icon>
             <span>Register</span>
           </v-btn>
       </v-flex>
+          
     </v-layout>
-  </v-container>
+  </div>
 </template>
 
 <script>
