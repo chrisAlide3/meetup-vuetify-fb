@@ -31,13 +31,19 @@ export default (meetup) => {
     return chipData = {
       id: meetup.id,
       color: 'error',
-      text: 'Closed'
+      text: 'Ended'
     }
-    } else if (meetupDateWithoutTime.getTime() == nowWithoutTime.getTime() || meetupDateWithoutTime.getTime() == nowPlusOneDay.getTime()) {
+    } else if (meetupDateWithoutTime.getTime() == nowWithoutTime.getTime()) {
       return chipData = {
         id: meetup.id,
-        color: 'amber',
-        text: 'Hurry!',
+        color: 'orange',
+        text: 'Ends Today!',
+      }
+    } else if (meetupDateWithoutTime.getTime() == nowPlusOneDay.getTime()) {
+      return chipData = {
+        id: meetup.id,
+        color: 'yellow darken-2',
+        text: 'Ends Tomorrow!',
       }
     } else {
       return chipData = {
