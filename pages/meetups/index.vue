@@ -68,7 +68,6 @@ export default {
     List
   },
   created () {
-    console.log('createdHook')
     for (let meetup of this.meetups) {
       this.chipData.push(this.setChipData({id: meetup.id, date: meetup.date, time: meetup.time}))
     }    
