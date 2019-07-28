@@ -21,7 +21,7 @@
                 </v-layout>
               </v-flex>
 
-              <v-flex xs7 sm8 md9>
+              <v-flex xs7 sm8 md7>
                 <v-layout column fill-height justify-space-between>                    
                     <div class="title ml-2 mt-1">{{ meetup.title }}</div>
                     <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }}</div>
@@ -35,6 +35,20 @@
                       Detail 
                       </v-btn>
                     </v-card-actions>
+                </v-layout>
+              </v-flex>
+
+              <v-flex md2 hidden-sm-and-down>
+                <v-layout column fill-height justify-center>
+                  <div class="text-xs-center">
+                    <v-chip
+                      small 
+                      :color="getChipData(meetup.id)[0].color"
+                      text-color="white"
+                    >
+                    {{ getChipData(meetup.id)[0].text }}
+                    </v-chip>
+                  </div>
                 </v-layout>
               </v-flex>
               
@@ -52,6 +66,17 @@ export default {
   components: {
     List
   },
+  created () {
+    console.log('createdHook')
+    for (let meetup of this.meetups) {
+      this.chipData.push(this.setChipData({id: meetup.id, date: meetup.date}))
+    }    
+  },
+  data () {
+    return {
+      chipData: []
+    }
+  },
   computed: {
     isLoggedIn () {
       return this.$store.getters.isLoggedIn
@@ -63,6 +88,39 @@ export default {
   methods: {
     detail (id) {
       this.$router.push('/meetups/' + id)
+    },
+    setChipData (meetup) {
+      let chipData = {}
+      const now = new Date()
+      let nowPlusOne = now
+      nowPlusOne.setDate(now.getDate() + 1)
+      const d = now.getDate()
+      console.log(d)
+      const meetupDate = new Date(meetup.date)
+      if (meetupDate < now) {
+        return chipData = {
+          id: meetup.id,
+          color: 'error',
+          text: 'Closed'
+        }
+        } else if (meetupDate == nowPlusOne) {
+          return chipData = {
+            id: meetup.id,
+            color: 'amber',
+            text: 'Hurry!',
+          }
+        } else {
+          return chipData = {
+            id: meetup.id,
+            color: 'success',
+            text: 'Open',
+          }
+        }
+    },
+    getChipData (id) {
+      return this.chipData.filter(e => {
+        return e.id == id
+      })
     }
   }
 }
