@@ -147,7 +147,8 @@
     methods: {
       register () {
         if (this.$refs.form.validate()) {
-          this.$store.dispatch('loading', 'register')
+          const loadElement = ['register']
+          this.$store.dispatch('loading', loadElement)
           this.$emit('register', this.formData)
         }
       },

@@ -98,7 +98,8 @@ export default {
     methods: {
       login () {
         if (this.$refs.form.validate()) {
-          this.$store.dispatch('loading', 'login')
+          const loadElement = ['login']
+          this.$store.dispatch('loading', loadElement)
           this.$emit('login', this.formData)
         }
       },

@@ -151,7 +151,8 @@
     methods: {
       saveProfile () {
         if (this.$refs.form.validate()) {
-          this.$store.dispatch('loading', 'profile')
+          const loadElement = ['profile']
+          this.$store.dispatch('loading', loadElement)
           const payload = {
             userid: this.$route.params.id,
             formData: this.formData
@@ -193,7 +194,8 @@
           userid: this.user.id,
           imgName: this.formData.imgName
         }
-        this.$store.dispatch('loading', 'removeUserImage')
+        const loadElement = ['removeUserImage']
+        this.$store.dispatch('loading', loadElement)
         this.$store.dispatch('removeUserImage', payload)
           .then(() => {
             console.log('image deleted')

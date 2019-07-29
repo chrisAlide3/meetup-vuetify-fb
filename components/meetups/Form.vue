@@ -198,12 +198,14 @@ export default {
           payload.formData.imgUrl = ''
         }
         payload.meetupId = this.$route.params.id
-        this.$store.dispatch('loading', 'save')
+        const loadElement = ['save']
+        this.$store.dispatch('loading', loadElement)
         this.$emit('updateMeetup', payload)
       } 
       if (!this.meetup && this.$refs.form.validate()) {
         payload.formData.imgUrl = ''
-        this.$store.dispatch('loading', 'save')
+        const loadElement = ['save']
+        this.$store.dispatch('loading', loadElement)
         this.$emit('addMeetup', payload)
       }
     },
@@ -229,7 +231,8 @@ export default {
     },
     onRemoveFile () {
       if (this.formData.imgName) {
-        this.$store.dispatch('loading', 'removeImage')
+        const loadElement = ['removeImage']
+        this.$store.dispatch('loading', loadElement)
         const payload = {
           meetupId: this.$route.params.id,
           imgName: this.formData.imgName
