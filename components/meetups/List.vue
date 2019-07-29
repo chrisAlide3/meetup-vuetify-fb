@@ -29,10 +29,20 @@
                       <v-btn
                         color="primary"
                         flat small
-                        @click="detail(meetup.id)"
+                        @click="$router.push('/meetups/' + meetup.id)"
                       >
                         <v-icon left light>arrow_forward</v-icon>
                       Detail 
+                      </v-btn>
+
+                      <v-btn
+                        color="error"
+                        flat small
+                        :loading="loading.includes('join') && loading.includes(meetup.id)"
+                        @click="joinMeetup(meetup.id)"
+                      >
+                        <v-icon left light>add</v-icon>
+                      Join
                       </v-btn>
 
                       <v-btn v-if="isAdmin"
@@ -102,11 +112,24 @@ export default {
       } else {
         return this.$store.getters.meetups
       }
+    },
+    loading () {
+      return this.$store.getters.loading
     }
   },
   methods: {
-    detail (id) {
-      this.$router.push('/meetups/' + id)
+    joinMeetup (id) {
+      const payload = {
+        idUser: this.user.id,
+        idMeetup: id
+      }
+      const loadElement = ['join', id]
+      this.$store.dispatch('loading', loadElement)
+      this.$store.dispatch('addMeetupToUser', payload)
+        .then(() => {
+          alert('check loading state')
+          this.$store.dispatch('clearLoading')
+        })
     },
     setChipData (meetup) {
       let chipData = {}

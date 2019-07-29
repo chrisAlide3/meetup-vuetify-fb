@@ -1,5 +1,5 @@
 // import * as firebase from 'firebase'
-import { fireAuth, fireDb, fireStorage } from '~/plugins/firebase.js'
+import { fireAuth, fireStore, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 
 export const state = () => ({
@@ -25,6 +25,9 @@ export const mutations = {
   clearUserImageFields (state) {
     state.user.imgUrl = ''
     state.user.imgName = ''
+  },
+  addMeetupToUser (state, meetupId) {
+    state.user.registeredMeetups.push(meetupId)
   },
   loadMeetups (state, meetups) {
     state.meetups = meetups
@@ -52,9 +55,8 @@ export const mutations = {
   clearError (state) {
     state.error = null
   },
-  loading (state, element) {
-    // state.loading = payload
-    state.loading.push(element)
+  loading (state, payload) {
+    state.loading = payload
   },
   clearLoading (state) {
     state.loading = []
@@ -270,6 +272,18 @@ export const actions = {
         console.log(error)
       })
   },
+  addMeetupToUser ({ commit }, payload) {
+    return fireDb.collection("users").doc(payload.idUser).update({
+      registeredMeetups: fireStore.FieldValue.arrayUnion(payload.idMeetup)
+    })
+      .then(response => {
+        console.log(response)
+        commit('addMeetupToUser', payload.idMeetup)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  },
   addMeetup ({ commit }, payload) {
     return fireDb.collection('meetups').add(payload.formData)
         .then(function(docRef) {
@@ -369,8 +383,8 @@ export const actions = {
   clearError ({ commit }) {
     commit('clearError')
   },
-  loading ( {commit }, element) {
-    commit('loading', element)
+  loading ( {commit }, payload) {
+    commit('loading', payload)
   },
   clearLoading ({ commit }) {
     commit('clearLoading')

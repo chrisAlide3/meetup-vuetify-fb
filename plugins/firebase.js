@@ -10,6 +10,7 @@ if (!firebase.apps.length) {
 }
 
 const fireAuth = firebase.auth()
+const fireStore = firebase.firestore
 const fireDb = firebase.firestore()
 const fireStorage = firebase.storage()
-export {fireAuth, fireDb, fireStorage}
+export {fireAuth, fireStore, fireDb, fireStorage}
