@@ -1,9 +1,5 @@
 <template>
-  <div>
-    <h1>Edit meetup route</h1>
-    <hr>
-    <Form :meetup="meetup" @updateMeetup="updateMeetup"/>
-  </div>
+  <Form :meetup="meetup" @updateMeetup="updateMeetup"/>
 </template>
 
 <script>

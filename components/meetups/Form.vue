@@ -6,7 +6,8 @@
 
           <v-layout row justify-center>
             <v-card-title>
-              <h2>Create a new meetup</h2>
+              <h2 v-if="!meetup" class="grey--text">Create a new meetup</h2>
+              <h2 v-else class="grey--text">Update meetup</h2>
             </v-card-title> 
           </v-layout>
 
