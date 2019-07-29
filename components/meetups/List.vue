@@ -1,6 +1,27 @@
 <template>
   <v-layout row justify-center>
     <v-flex xs12 sm8>
+      <!-- Snackbar, displayed after Join -->
+      <v-snackbar
+        v-model="snackbar"
+        :bottom="y === 'bottom'"
+        :left="x === 'left'"
+        :multi-line="mode === 'multi-line'"
+        :right="x === 'right'"
+        :timeout="timeout"
+        :top="y === 'top'"
+        :vertical="mode === 'vertical'"
+      >
+        {{ text }}
+        <v-btn
+          color="pink"
+          flat
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+    </v-snackbar>
+
       <v-card>
         <v-container fluid>
           <v-layout
@@ -35,7 +56,7 @@
                       Detail 
                       </v-btn>
 
-                      <v-btn
+                      <v-btn v-if="!user.registeredMeetups.includes(meetup.id)"
                         color="error"
                         flat small
                         :loading="loading.includes('join') && loading.includes(meetup.id)"
@@ -94,7 +115,15 @@ export default {
   },
   data () {
     return {
-      chipData: []
+      chipData: [],
+      // Snackbar Data
+      snackbar: false,
+      y: 'top',
+      x: null,
+      mode: '',
+      timeout: 6000,
+      text: 'Meetup added to your joined list'
+      //  
     }
   },
   computed: {
@@ -127,8 +156,8 @@ export default {
       this.$store.dispatch('loading', loadElement)
       this.$store.dispatch('addMeetupToUser', payload)
         .then(() => {
-          alert('check loading state')
           this.$store.dispatch('clearLoading')
+          this.snackbar = true
         })
     },
     setChipData (meetup) {
