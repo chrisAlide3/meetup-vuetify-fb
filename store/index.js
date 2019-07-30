@@ -29,6 +29,12 @@ export const mutations = {
   addMeetupToUser (state, meetupId) {
     state.user.registeredMeetups.push(meetupId)
   },
+  removeMeetupFromUser (state, meetupId) {
+    const index = state.user.registeredMeetups.lastIndexOf(meetupId)
+    if (index > -1) {
+      state.user.registeredMeetups.splice(index, 1)
+    }
+  },
   loadMeetups (state, meetups) {
     state.meetups = meetups
   },
@@ -279,6 +285,18 @@ export const actions = {
       .then(response => {
         console.log(response)
         commit('addMeetupToUser', payload.idMeetup)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  },
+  removeMeetupFromUser ({ commit }, payload) {
+    return fireDb.collection("users").doc(payload.idUser).update({
+      registeredMeetups: fireStore.FieldValue.arrayRemove(payload.idMeetup)
+    })
+      .then(response => {
+        console.log(response)
+        commit('removeMeetupFromUser', payload.idMeetup)
       })
       .catch(err => {
         console.error(err)

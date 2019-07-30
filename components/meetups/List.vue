@@ -1,5 +1,21 @@
 <template>
   <v-layout row justify-center>
+    <!-- Dialog to confirm unjoin Meetup -->
+    <v-dialog v-model="dialog" persistent max-width="290">
+      <template v-slot:activator="{ on }">
+        <!-- <v-btn color="primary" dark v-on="on">Open Dialog</v-btn> -->
+      </template>
+      <v-card>
+        <v-card-title class="headline">Unregister Meetup?</v-card-title>
+        <v-card-text><span>Click AGREE to unregister meetup </span><span style="color:red">{{ dialogMeetup.meetupTitle }}</span> </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="green darken-1" flat @click="dialog = false">Disagree</v-btn>
+          <v-btn color="red darken-1" flat @click="leaveMeetup(dialogMeetup.meetupId)">Agree</v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
     <v-flex xs12 sm8>
       <!-- Snackbar, displayed after Join -->
       <v-snackbar
@@ -43,44 +59,57 @@
               </v-flex>
 
               <v-flex xs7 sm8 md7>
-                <v-layout column fill-height justify-space-between>                    
-                    <div class="title ml-2 mt-1">{{ meetup.title }}</div>
-                    <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }} {{ meetup.time == null ?'' :'at '+meetup.time }}</div>
-                    <v-card-actions>
-                      <v-btn
-                        color="primary"
-                        flat small
-                        @click="$router.push('/meetups/' + meetup.id)"
-                      >
-                        <v-icon left light>arrow_forward</v-icon>
-                      Detail 
-                      </v-btn>
+                <v-layout column fill-height justify-space-between>
+                  <div class="title ml-2 mt-1">{{ meetup.title }}</div>
+                  <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }} {{ meetup.time == null ?'' :'at '+meetup.time }}</div>
+                  <v-card-actions>
+                    <v-btn
+                      color="primary"
+                      flat small
+                      @click="$router.push('/meetups/' + meetup.id)"
+                    >
+                      <v-icon left light>arrow_forward</v-icon>
+                    Detail 
+                    </v-btn>
 
-                      <v-btn v-if="!user.registeredMeetups.includes(meetup.id)"
-                        color="error"
-                        flat small
-                        :loading="loading.includes('join') && loading.includes(meetup.id)"
-                        @click="joinMeetup(meetup.id)"
-                      >
-                        <v-icon left light>add</v-icon>
-                      Join
-                      </v-btn>
+                    <v-btn v-if="!user.registeredMeetups.includes(meetup.id) && getChipData(meetup.id)[0].text != 'Ended' "
+                      color="error"
+                      flat small
+                      :loading="loading.includes('join') && loading.includes(meetup.id)"
+                      @click="joinMeetup(meetup.id)"
+                    >
+                      <v-icon left light>add</v-icon>
+                    Join
+                    </v-btn>
 
-                      <v-btn v-if="isAdmin"
-                        color="success"
-                        flat small
-                        @click="$router.push('/admin/meetups/' + meetup.id)"
-                      >
-                        <v-icon left light>edit</v-icon>
-                      Edit
-                      </v-btn>
-                    </v-card-actions>
+                    <v-btn v-if="isAdmin"
+                      color="success"
+                      flat small
+                      @click="$router.push('/admin/meetups/' + meetup.id)"
+                    >
+                      <v-icon left light>edit</v-icon>
+                    Edit
+                    </v-btn>
+                  </v-card-actions>
                 </v-layout>
               </v-flex>
 
               <v-flex md2 hidden-sm-and-down>
-                <v-layout column fill-height justify-center>
-                  <div class="text-xs-center">
+                <v-layout column fill-height>
+                  <v-flex shrink justify-self-start class="text-xs-center">
+                    <v-btn
+                      flat
+                      icon
+                      color="indigo"
+                      class="mt-0"
+                      :loading="loading.includes('leave') && loading.includes(meetup.id)"
+                      :disabled="!user.registeredMeetups.includes(meetup.id)"
+                      @click="meetupDialog({id: meetup.id, title: meetup.title})"  
+                    >
+                      <v-icon>star</v-icon>
+                    </v-btn>
+                  </v-flex>
+                  <v-flex shrink class="text-xs-center mt-3">
                     <v-chip
                       small 
                       :color="getChipData(meetup.id)[0].color"
@@ -88,7 +117,7 @@
                     >
                     {{ getChipData(meetup.id)[0].text }}
                     </v-chip>
-                  </div>
+                  </v-flex>
                 </v-layout>
               </v-flex>
               
@@ -122,8 +151,11 @@ export default {
       x: null,
       mode: '',
       timeout: 6000,
-      text: 'Meetup added to your joined list'
-      //  
+      text: '',
+      // Dialog Data
+      dialog: false,
+      dialogMeetup: {},
+      dialogResponse: ''
     }
   },
   computed: {
@@ -157,7 +189,35 @@ export default {
       this.$store.dispatch('addMeetupToUser', payload)
         .then(() => {
           this.$store.dispatch('clearLoading')
+          this.text = 'Meetup added to your joined list'
           this.snackbar = true
+        })
+    },
+    meetupDialog (meetup) {
+      if (this.getChipData(meetup.id)[0].text === 'Ended') {
+        return
+      } else {
+        this.dialogMeetup = {
+        meetupId: meetup.id,
+        meetupTitle: meetup.title
+      }
+      this.dialog = true
+      }
+    },
+    leaveMeetup (id) {
+      this.dialog = false
+      const loadElement = ['leave', id]
+      this.$store.dispatch('loading', loadElement)
+      const payload = {
+        idMeetup: id,
+        idUser: this.user.id
+      }
+      this.$store.dispatch('removeMeetupFromUser', payload)
+        .then(() => {
+          this.$store.dispatch('clearLoading')
+          this.text = 'Meetup ' + this.dialogMeetup.meetupTitle + ' unregistered!'
+          this.snackbar = true
+          // Display snackbar leaveMeetup
         })
     },
     setChipData (meetup) {
