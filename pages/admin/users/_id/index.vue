@@ -26,6 +26,7 @@ export default {
           this.$router.push('/')
         })
     }
-  }
+  },
+  middleware: ['checkAuth']
 }
 </script>

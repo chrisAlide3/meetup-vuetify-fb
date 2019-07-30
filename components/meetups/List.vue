@@ -71,17 +71,19 @@
                       <v-icon left light>arrow_forward</v-icon>
                     Detail 
                     </v-btn>
-
-                    <v-btn v-if="!user.registeredMeetups.includes(meetup.id) && getChipData(meetup.id)[0].text != 'Ended' "
-                      color="error"
-                      flat small
-                      :loading="loading.includes('join') && loading.includes(meetup.id)"
-                      @click="joinMeetup(meetup.id)"
-                    >
-                      <v-icon left light>add</v-icon>
-                    Join
-                    </v-btn>
-
+                    <!-- Only if user loggedIn -->
+                    <template v-if="user">
+                      <v-btn v-if="!user.registeredMeetups.includes(meetup.id) && getChipData(meetup.id)[0].text != 'Ended' "
+                        color="error"
+                        flat small
+                        :loading="loading.includes('join') && loading.includes(meetup.id)"
+                        @click="joinMeetup(meetup.id)"
+                      >
+                        <v-icon left light>add</v-icon>
+                      Join
+                      </v-btn>
+                    </template>
+                    <!--  -->
                     <v-btn v-if="isAdmin"
                       color="success"
                       flat small
@@ -97,17 +99,21 @@
               <v-flex md2 hidden-sm-and-down>
                 <v-layout column fill-height>
                   <v-flex shrink justify-self-start class="text-xs-center">
-                    <v-btn
-                      flat
-                      icon
-                      color="indigo"
-                      class="mt-0"
-                      :loading="loading.includes('leave') && loading.includes(meetup.id)"
-                      :disabled="!user.registeredMeetups.includes(meetup.id)"
-                      @click="meetupDialog({id: meetup.id, title: meetup.title})"  
-                    >
-                      <v-icon>star</v-icon>
-                    </v-btn>
+                    <!-- Only if user LoggedIn -->
+                    <template v-if="user">
+                      <v-btn
+                        flat
+                        icon
+                        color="indigo"
+                        class="mt-0"
+                        :loading="loading.includes('leave') && loading.includes(meetup.id)"
+                        :disabled="!user.registeredMeetups.includes(meetup.id)"
+                        @click="meetupDialog({id: meetup.id, title: meetup.title})"  
+                      >
+                        <v-icon>star</v-icon>
+                      </v-btn>
+                    </template>
+                    <!--  -->
                   </v-flex>
                   <v-flex shrink class="text-xs-center mt-3">
                     <v-chip
