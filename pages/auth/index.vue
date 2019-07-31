@@ -29,7 +29,13 @@ export default {
         .then(() => {
           this.$store.dispatch('clearLoading')
           if (!this.$store.getters.error) {
-            this.$router.push('/admin/meetups')
+            const pushPath = this.$cookies.get('routeGuardPath')
+            if (pushPath != undefined) {
+              this.$cookies.remove('routeGuardPath')
+              this.$router.push(pushPath)
+            } else {
+              this.$router.push('/')
+            }
           }
         })
     }

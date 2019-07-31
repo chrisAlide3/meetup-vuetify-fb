@@ -1,5 +1,28 @@
 <template>
   <v-container>
+    <!-- Snackbar if redirected from routeGuard -->
+    <v-flex xs12 sm8>
+      <v-snackbar
+        v-model="snackbar"
+        :bottom="y === 'bottom'"
+        :left="x === 'left'"
+        :multi-line="mode === 'multi-line'"
+        :right="x === 'right'"
+        :timeout="timeout"
+        :top="y === 'top'"
+        :vertical="mode === 'vertical'"
+      >
+        {{ text }}
+        <v-btn
+          color="pink"
+          flat
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </v-snackbar>
+    </v-flex>
+
     <v-layout row justify-center v-if="error">
       <v-flex xs12 sm6>
         <Alert :message="error.message" @dismissed='onDismissed' />        
@@ -67,9 +90,23 @@
 
 <script>
 export default {
+  created () {
+    // Show snackbar if routeGuardPath cookie
+    if (this.$cookies.get('routeGuardPath') != undefined) {
+      this.text = 'You must be logged in to access this area!'
+      this.snackbar = true
+    }
+  },
   data: () => ({
       showPassword: false,
       valid: true,
+      // Snackbar Data
+      snackbar: false,
+      y: 'top',
+      x: null,
+      mode: '',
+      timeout: 6000,
+      text: '',
 
       emailRules: [
         v => !!v || 'E-mail is required',

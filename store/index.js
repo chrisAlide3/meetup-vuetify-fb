@@ -81,7 +81,7 @@ export const actions = {
           // console.log(doc.id, " => ", doc.data())
           meetups.push({...doc.data(), id: doc.id})
       })
-      serverContext.app.store.commit('loadMeetups', meetups)
+      vuexContext.commit('loadMeetups', meetups)
       // Load userData
       let signedInUser = ''
       const authId = serverContext.app.$cookies.get('userId')
@@ -92,7 +92,7 @@ export const actions = {
                 // doc.data() is never undefined for query doc snapshots
                 signedInUser = {...doc.data(), id: doc.id}
               })
-            serverContext.app.store.commit('loadUser', signedInUser)
+            vuexContext.commit('loadUser', signedInUser)
           })
           .catch(function(error) {
               console.log("Error getting documents: ", error);
