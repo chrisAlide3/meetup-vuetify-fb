@@ -29,7 +29,7 @@ export default {
         .then(() => {
           this.$store.dispatch('clearLoading')
           if (!this.$store.getters.error) {
-            this.$router.push('/')
+            this.$router.push('/admin/meetups')
           }
         })
     }

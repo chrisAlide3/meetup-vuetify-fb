@@ -182,17 +182,29 @@ export const actions = {
     )
   },
   login ({ commit }, formData) {
-    return (
-      fireAuth.signInWithEmailAndPassword(formData.email, formData.password)
+    return fireAuth.signInWithEmailAndPassword(formData.email, formData.password)
       .then(res => {
         console.log('user signed in on firebase')
-        commit('clearError')
+        let user = {}
+        const usersRef = fireDb.collection("users")
+        const query =  usersRef.where("authid", "==", res.user.uid)
+         return query.get()
+          .then(function (querySnapshot) {
+            querySnapshot.forEach(function (doc) {
+              user = {...doc.data(), id: doc.id}
+            })
+            commit('clearError')
+            commit('loadUser', user)
+          })
+          .catch(err => {
+            commit('setError', err)
+            console.error(err)
+          })
         })
         .catch(err => {
           commit('setError', err)
           console.error(err)
         })
-    )
   },
   logout ({commit}) {
     return fireAuth.signOut()

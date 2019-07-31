@@ -1,7 +1,7 @@
 import { fireAuth, fireDb } from '~/plugins/firebase.js'
 
 export default (context => {
-  fireAuth.onAuthStateChanged(function(user) {
+  return fireAuth.onAuthStateChanged(function(user) {
     if (user) {
       console.log('plugin firebaseAuth SignedIn')
       user.getIdToken()
