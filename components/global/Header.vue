@@ -177,6 +177,7 @@ export default {
         menuItems = [
           { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
           { title: 'My Meetups', icon: 'person_pin_circle', route: '/admin/meetups' },
+          { title: 'Joined Meetups', icon: 'add_location', route: '/admin/meetups/joined' },
           { title: 'Organise Meetup', icon: 'group_add', route: '/admin/meetups/new' },
           { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, subItems: [
               { title: 'Edit', icon: 'edit', route: '/admin/users/' + this.$store.getters.user.id  }, 
@@ -201,9 +202,7 @@ export default {
     profileMenu (item) {
       if (item.title === 'Logout') {
         this.$store.dispatch('logout')
-          .then(() => {
-            this.$router.push('/')
-          })
+        this.$router.push('/')
       }
     }
   }

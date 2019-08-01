@@ -14,7 +14,7 @@ export const mutations = {
     state.user = user
   },
   logoutUser (state) {
-    this.state.user = ''
+    state.user = ''
   },
   updateUser ( state, formData) {
     state.user.firstname = formData.firstname
@@ -207,7 +207,7 @@ export const actions = {
         })
   },
   logout ({commit}) {
-    return fireAuth.signOut()
+    fireAuth.signOut()
       .then(function() {
         console.log('User signedOut of Firebase')
       })

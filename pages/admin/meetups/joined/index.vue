@@ -1,5 +1,5 @@
 <template>
-  <List :isAdmin="true" :joined="$route.query.joined"/>
+  <List :isAdmin="true" :joined="true" />
 </template>
 
 <script>
@@ -12,3 +12,4 @@ export default {
   middleware: ['checkAuth']
 }
 </script>
+
