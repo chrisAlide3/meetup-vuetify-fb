@@ -77,6 +77,19 @@
               >
               </v-text-field>
 
+              <v-text-field
+                v-model="formData.confirmPassword"
+                :rules="passwordMatch"
+                :append-icon="showPassword ? 'visibility' : 'visibility_off'"
+                :type="showPassword ? 'text' : 'password'"
+                name="input-10-2"
+                label="Confirm Password"
+                hint="At least 8 characters"
+                counter
+                @click:append="showPassword = !showPassword"
+              >
+              </v-text-field>
+
               <v-btn
                 :loading="loading.includes('register')"
                 :disabled="!valid || loading.includes('register')"
@@ -132,7 +145,9 @@
         surname: '',
         image: null,
         email: '',
-        password: ''
+        password: '',
+        confirmPassword: '',
+
       },
       imgUrl: '',
     }),
@@ -142,6 +157,13 @@
       },
       loading () {
         return this.$store.getters.loading
+      },
+      passwordMatch () {
+        if (this.formData.password !== this.formData.confirmPassword) {
+          return ["Confirmed password doesn't match"]
+        } else {
+          return []
+        }
       }
     },
     methods: {
@@ -149,6 +171,7 @@
         if (this.$refs.form.validate()) {
           const loadElement = ['register']
           this.$store.dispatch('loading', loadElement)
+          delete this.formData.confirmPassword
           this.$emit('register', this.formData)
         }
       },
