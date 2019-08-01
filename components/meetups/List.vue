@@ -151,10 +151,6 @@ export default {
       type: Boolean,
       required: false
     },
-    // joined: {
-    //   type: Boolean,
-    //   required: false
-    // }
   },
   created () {
     for (let meetup of this.meetups) {
