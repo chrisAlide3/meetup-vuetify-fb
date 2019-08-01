@@ -73,7 +73,8 @@
                     </v-btn>
                     <!-- Only if user loggedIn -->
                     <template v-if="user">
-                      <v-btn v-if="!user.registeredMeetups.includes(meetup.id) && getChipData(meetup.id)[0].text != 'Ended' "
+                      <!-- Join button only if not own meetup and not already joined and meetup not ended -->
+                      <v-btn v-if="meetup.userId !== user.id && !user.registeredMeetups.includes(meetup.id) && getChipData(meetup.id)[0].text != 'Ended' "
                         color="error"
                         flat small
                         :loading="loading.includes('join') && loading.includes(meetup.id)"
@@ -84,7 +85,7 @@
                       </v-btn>
                     </template>
                     <!--  -->
-                    <v-btn v-if="isAdmin"
+                    <v-btn v-if="isAdmin && user.id === meetup.userId"
                       color="success"
                       flat small
                       @click="$router.push('/admin/meetups/' + meetup.id)"
