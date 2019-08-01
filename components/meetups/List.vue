@@ -84,7 +84,7 @@
                       </v-btn>
                     </template>
                     <!--  -->
-                    <v-btn v-if="isAdmin && user.id === meetup.userId"
+                    <v-btn v-if="isAdmin"
                       color="success"
                       flat small
                       @click="$router.push('/admin/meetups/' + meetup.id)"
@@ -138,16 +138,21 @@
 
 export default {
   props: {
+    meetups: {
+      type: Array,
+      required: true
+    },
     isAdmin: {
       type: Boolean,
       required: false
     },
-    joined: {
-      type: Boolean,
-      required: false
-    }
+    // joined: {
+    //   type: Boolean,
+    //   required: false
+    // }
   },
   created () {
+    console.log(this.meetups)
     for (let meetup of this.meetups) {
       this.chipData.push(this.setChipData({id: meetup.id, date: meetup.date, time: meetup.time}))
     }    
@@ -175,28 +180,9 @@ export default {
     user () {
       return this.$store.getters.user
     },
-    meetups () {
-      if (this.isAdmin && !this.joined) {
-        return this.$store.getters.meetups.filter(e => {
-          return e.userId == this.user.id
-        })
-      } else if (this.isAdmin && this.joined){
-        return this.$store.getters.meetups.filter(e => {
-          return this.user.registeredMeetups.includes(e.id)
-        })
-      } else {
-        return this.$store.getters.meetups
-      }
-    },
     loading () {
       return this.$store.getters.loading
     }
-  },
-  watch: {
-    $route (newRoute, oldRoute) {
-      console.log('new / old: ', newRoute + '/' + oldRoute)
-    }
-
   },
   methods: {
     joinMeetup (id) {
