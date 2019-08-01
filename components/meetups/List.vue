@@ -40,94 +40,98 @@
 
       <v-card>
         <v-container fluid>
-          <v-layout
+          <!-- Show message when no meetups to display -->
+          <v-layout row v-if="meetups.length < 1">
+            <p class="subheading">No meetups to display</p>
+          </v-layout>
+          <v-layout v-else
             row
             fill-height
             v-for="meetup in meetups"
             :key="meetup.title"
             class="mb-2"  
           >
-              <v-flex xs5 sm4 md3>
-                <v-layout column fill-height>
-                  <v-img
-                  :src="meetup.imgUrl"
-                  height="120px"
+            <v-flex xs5 sm4 md3>
+              <v-layout column fill-height>
+                <v-img
+                :src="meetup.imgUrl"
+                height="120px"
+                >
+                <div class="caption red--text darken-2 font-weight-bold ml-2">{{ meetup.location }}</div>
+                </v-img>
+              </v-layout>
+            </v-flex>
+
+            <v-flex xs7 sm8 md7>
+              <v-layout column fill-height justify-space-between>
+                <div class="title ml-2 mt-1">{{ meetup.title }}</div>
+                <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }} {{ meetup.time == null ?'' :'at '+meetup.time }}</div>
+                <v-card-actions>
+                  <v-btn
+                    color="primary"
+                    flat small
+                    @click="$router.push('/meetups/' + meetup.id)"
                   >
-                  <div class="caption red--text darken-2 font-weight-bold ml-2">{{ meetup.location }}</div>
-                  </v-img>
-                </v-layout>
-              </v-flex>
+                    <v-icon left light>arrow_forward</v-icon>
+                  Detail 
+                  </v-btn>
+                  <!-- Only if user loggedIn -->
+                  <template v-if="user">
+                    <!-- Join button only if not own meetup and not already joined and meetup not ended -->
+                    <v-btn v-if="meetup.userId !== user.id && !user.registeredMeetups.includes(meetup.id) && getChipData(meetup.id)[0].text != 'Ended' "
+                      color="error"
+                      flat small
+                      :loading="loading.includes('join') && loading.includes(meetup.id)"
+                      @click="joinMeetup(meetup.id)"
+                    >
+                      <v-icon left light>add</v-icon>
+                    Join
+                    </v-btn>
+                  </template>
+                  <!--  -->
+                  <v-btn v-if="isAdmin && user.id === meetup.userId"
+                    color="success"
+                    flat small
+                    @click="$router.push('/admin/meetups/' + meetup.id)"
+                  >
+                    <v-icon left light>edit</v-icon>
+                  Edit
+                  </v-btn>
+                </v-card-actions>
+              </v-layout>
+            </v-flex>
 
-              <v-flex xs7 sm8 md7>
-                <v-layout column fill-height justify-space-between>
-                  <div class="title ml-2 mt-1">{{ meetup.title }}</div>
-                  <div class="subheading ml-2 grey--text font-weight-bold">{{ meetup.date | date }} {{ meetup.time == null ?'' :'at '+meetup.time }}</div>
-                  <v-card-actions>
+            <v-flex md2 hidden-sm-and-down>
+              <v-layout column fill-height>
+                <v-flex shrink justify-self-start class="text-xs-center">
+                  <!-- Only if user LoggedIn -->
+                  <template v-if="user">
                     <v-btn
-                      color="primary"
-                      flat small
-                      @click="$router.push('/meetups/' + meetup.id)"
+                      flat
+                      icon
+                      color="indigo"
+                      class="mt-0"
+                      :loading="loading.includes('leave') && loading.includes(meetup.id)"
+                      :disabled="!user.registeredMeetups.includes(meetup.id)"
+                      @click="meetupDialog({id: meetup.id, title: meetup.title})"  
                     >
-                      <v-icon left light>arrow_forward</v-icon>
-                    Detail 
+                      <v-icon>star</v-icon>
                     </v-btn>
-                    <!-- Only if user loggedIn -->
-                    <template v-if="user">
-                      <!-- Join button only if not own meetup and not already joined and meetup not ended -->
-                      <v-btn v-if="meetup.userId !== user.id && !user.registeredMeetups.includes(meetup.id) && getChipData(meetup.id)[0].text != 'Ended' "
-                        color="error"
-                        flat small
-                        :loading="loading.includes('join') && loading.includes(meetup.id)"
-                        @click="joinMeetup(meetup.id)"
-                      >
-                        <v-icon left light>add</v-icon>
-                      Join
-                      </v-btn>
-                    </template>
-                    <!--  -->
-                    <v-btn v-if="isAdmin && user.id === meetup.userId"
-                      color="success"
-                      flat small
-                      @click="$router.push('/admin/meetups/' + meetup.id)"
-                    >
-                      <v-icon left light>edit</v-icon>
-                    Edit
-                    </v-btn>
-                  </v-card-actions>
-                </v-layout>
-              </v-flex>
-
-              <v-flex md2 hidden-sm-and-down>
-                <v-layout column fill-height>
-                  <v-flex shrink justify-self-start class="text-xs-center">
-                    <!-- Only if user LoggedIn -->
-                    <template v-if="user">
-                      <v-btn
-                        flat
-                        icon
-                        color="indigo"
-                        class="mt-0"
-                        :loading="loading.includes('leave') && loading.includes(meetup.id)"
-                        :disabled="!user.registeredMeetups.includes(meetup.id)"
-                        @click="meetupDialog({id: meetup.id, title: meetup.title})"  
-                      >
-                        <v-icon>star</v-icon>
-                      </v-btn>
-                    </template>
-                    <!--  -->
-                  </v-flex>
-                  <v-flex shrink class="text-xs-center mt-3">
-                    <v-chip
-                      small 
-                      :color="getChipData(meetup.id)[0].color"
-                      :text-color="getChipData(meetup.id)[0].textColor"
-                    >
-                    {{ getChipData(meetup.id)[0].text }}
-                    </v-chip>
-                  </v-flex>
-                </v-layout>
-              </v-flex>
-              
+                  </template>
+                  <!--  -->
+                </v-flex>
+                <v-flex shrink class="text-xs-center mt-3">
+                  <v-chip
+                    small 
+                    :color="getChipData(meetup.id)[0].color"
+                    :text-color="getChipData(meetup.id)[0].textColor"
+                  >
+                  {{ getChipData(meetup.id)[0].text }}
+                  </v-chip>
+                </v-flex>
+              </v-layout>
+            </v-flex>
+            
           </v-layout>
         </v-container>
       </v-card>
@@ -153,7 +157,6 @@ export default {
     // }
   },
   created () {
-    console.log(this.meetups)
     for (let meetup of this.meetups) {
       this.chipData.push(this.setChipData({id: meetup.id, date: meetup.date, time: meetup.time}))
     }    

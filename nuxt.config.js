@@ -83,6 +83,10 @@ export default {
       success: colors.green.base
     }
   },
+  // Called on each Route change
+  router: {
+    middleware: 'clearSearch'
+  },
   /*
   ** Build configuration
   */

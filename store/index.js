@@ -6,7 +6,8 @@ export const state = () => ({
   user: '',
   meetups: [],
   loading: [],
-  error: null
+  error: null,
+  searchString: ''
 })
 
 export const mutations = {
@@ -66,6 +67,12 @@ export const mutations = {
   },
   clearLoading (state) {
     state.loading = []
+  },
+  setSearchString (state, searchString) {
+    state.searchString = searchString
+  },
+  clearSearch (state) {
+    state.searchString = ''
   }
 }
 
@@ -418,6 +425,9 @@ export const actions = {
   },
   clearLoading ({ commit }) {
     commit('clearLoading')
+  },
+  setSearchString ({ commit }, searchString) {
+    commit('setSearchString', searchString)
   }
 }
 
@@ -440,5 +450,8 @@ export const getters = {
   },
   loading (state) {
     return state.loading
+  },
+  searchString (state) {
+    return state.searchString
   }
 }
