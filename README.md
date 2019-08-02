@@ -8,6 +8,9 @@
 # install dependencies
 $ yarn install
 
+# Enter your Firebase crendentials in .config.copy.js then rename the file
+$ mv ./.config.copy.js .config.js
+
 # serve with hot reload at localhost:3000
 $ yarn run dev
 

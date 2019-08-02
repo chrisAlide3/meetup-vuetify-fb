@@ -30,11 +30,16 @@ export default {
   ** Global CSS
   */
   css: [
+    '~/assets/style/main.css'
   ],
   /*
   ** Plugins to load before mounting the App
   */
   plugins: [
+    '~plugins/firebase.js',
+    '~plugins/firebaseAuth.js',
+    '~plugins/core-components.js',
+    '~plugins/date-filter.js'
   ],
   /*
   ** Nuxt.js modules
@@ -43,7 +48,8 @@ export default {
     '@nuxtjs/vuetify',
     // Doc: https://axios.nuxtjs.org/usage
     '@nuxtjs/axios',
-    '@nuxtjs/eslint-module'
+    // Doc: https://www.npmjs.com/package/cookie-universal-nuxt
+    'cookie-universal-nuxt'
   ],
   /*
   ** Axios module configuration
@@ -55,16 +61,31 @@ export default {
   ** vuetify module configuration
   ** https://github.com/nuxt-community/vuetify-module
   */
+  // vuetify: {
+  //   theme: {
+  //     primary: colors.blue.darken2,
+  //     accent: colors.grey.darken3,
+  //     secondary: colors.amber.darken3,
+  //     info: colors.teal.lighten1,
+  //     warning: colors.amber.base,
+  //     error: colors.deepOrange.accent4,
+  //     success: colors.green.accent3
+  //   }
+  // },
   vuetify: {
     theme: {
-      primary: colors.blue.darken2,
-      accent: colors.grey.darken3,
-      secondary: colors.amber.darken3,
-      info: colors.teal.lighten1,
-      warning: colors.amber.base,
-      error: colors.deepOrange.accent4,
-      success: colors.green.accent3
+      primary: colors.teal.base,
+      secondary: colors.cyan.base,
+      accent: colors.blue.base,
+      error: colors.red.base,
+      warning: colors.yellow.base,
+      info: colors.amber.base,
+      success: colors.green.base
     }
+  },
+  // Called on each Route change
+  router: {
+    middleware: 'clearSearch'
   },
   /*
   ** Build configuration

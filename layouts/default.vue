@@ -1,5 +1,5 @@
 <template>
-  <v-app dark>
+  <v-app>
     <Header />
     <v-content>
       <v-container>
@@ -7,7 +7,6 @@
       </v-container>
     </v-content>
     <v-footer
-      :fixed="fixed"
       app
     >
       <span>&copy; 2019</span>
