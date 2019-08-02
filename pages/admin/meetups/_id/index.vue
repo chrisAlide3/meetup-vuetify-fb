@@ -33,7 +33,7 @@ export default {
         .then(() => {
           this.$store.dispatch('clearLoading')
           if (!this.error) {
-            this.$router.push('/')
+            this.$router.go(-1)
           } else {
             console.log('Meetup not updated')
           }

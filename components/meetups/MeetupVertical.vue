@@ -24,8 +24,20 @@
           </v-flex>
 
           <v-card-actions>
-            <v-btn flat color="orange">Share</v-btn>
-            <v-btn flat color="orange">Explore</v-btn>
+            <v-btn flat color="black" @click="$router.go(-1)">
+              <v-icon left>cancel</v-icon>
+              Cancel
+            </v-btn>
+            <template v-if="isLoggedIn">
+              <v-btn v-if="user.id === meetup.userId" flat color="success">
+                <v-icon left>edit</v-icon>
+                Edit
+              </v-btn>
+            </template>
+            <v-btn flat color="orange">
+              <v-icon left>share</v-icon>
+              Share
+            </v-btn>
           </v-card-actions>
         </v-layout>
       </v-card>
@@ -41,5 +53,13 @@ export default {
       required: true
     }
   },
+  computed: {
+    isLoggedIn () {
+      return this.$store.getters.isLoggedIn
+    },
+    user () {
+      return this.$store.getters.user
+    }
+  }
 }
 </script>
