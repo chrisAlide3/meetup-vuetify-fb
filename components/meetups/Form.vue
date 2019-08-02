@@ -87,23 +87,70 @@
 
               <v-layout row wrap justify-center>
                 <v-flex xs12 sm10>
-                  <v-date-picker
-                    v-model="formData.date"
-                    :landscape="landscape"
-                    :reactive="reactive">
-                  </v-date-picker>
+                   <v-menu
+                    ref="dateMenu"
+                    v-model="dateMenu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    :return-value.sync="formData.date"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        v-model="formData.date"
+                        label="Meetup Date"
+                        prepend-icon="event"
+                        readonly
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-date-picker v-model="formData.date" no-title scrollable :allowed-dates="allowedDates">
+                      <v-spacer></v-spacer>
+                      <v-btn flat color="primary" @click="dateMenu = false">Cancel</v-btn>
+                      <v-btn flat color="primary" @click="$refs.dateMenu.save(formData.date)">OK</v-btn>
+                    </v-date-picker>
+                  </v-menu>
                 </v-flex>
               </v-layout>
 
               <v-layout row wrap justify-center class="mt-3">
                 <v-flex xs12 sm10>
-                  <v-time-picker
-                    v-model="formData.time"
-                    :rules="timeRules"
-                    format="24hr"
-                    :landscape="landscape">
-                    </v-time-picker>
-                  </v-flex>
+                  <v-menu
+                    ref="timeMenu"
+                    v-model="timeMenu"
+                    :close-on-content-click="false"
+                    :nudge-right="40"
+                    :return-value.sync="formData.time"
+                    lazy
+                    transition="scale-transition"
+                    offset-y
+                    full-width
+                    max-width="290px"
+                    min-width="290px"
+                  >
+                    <template v-slot:activator="{ on }">
+                      <v-text-field
+                        v-model="formData.time"
+                        :rules="checkDate"
+                        label="Meetup Time"
+                        prepend-icon="access_time"
+                        readonly
+                        v-on="on"
+                      ></v-text-field>
+                    </template>
+                    <v-time-picker
+                      v-if="timeMenu"
+                      v-model="formData.time"
+                      format="24hr"
+                      full-width
+                      @click:minute="$refs.timeMenu.save(formData.time)"
+                    ></v-time-picker>
+                  </v-menu>
+                </v-flex>
               </v-layout>
 
               <v-layout row justify-center class="mt-3">
@@ -156,9 +203,14 @@ export default {
   },
   data () {
     return {
-      valid: true,
+      valid: false,
+      // Picker full display
       landscape: true,
       reactive: false,
+      // Datepicker as Menu
+      dateMenu: false,
+      // Timepicker as Menu
+      timeMenu: false,
 
       titleRules: [
         v => !!v || 'Title is required',
@@ -169,16 +221,13 @@ export default {
       locationRules: [
         v => !!v || 'Location is required',
       ],
-      timeRules: [
-        v => !!v || 'Time is required',
-      ],
 
       formData: {
         title: '',
         location: '',
         description: '',
         date: new Date().toISOString().substr(0, 10),
-        time: null,
+        time: '00:00',
         userId: this.$store.getters.user.id,
         imgName: '',
         imgUrl: '',
@@ -195,7 +244,19 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
-    }
+    }, 
+    checkDate () {
+      const now = new Date()
+      const enteredDate = new Date(this.formData.date)
+      const hours_minutes = this.formData.time.split(':')
+      enteredDate.setHours(hours_minutes[0])
+      enteredDate.setMinutes(hours_minutes[1])
+      if (enteredDate.getTime() < now.getTime()) {
+        return ["Time is in the past, please adjust! Or choose another Date"]
+      } else {
+        return []
+      }
+    },
   },
   methods: {
     save () {
@@ -255,7 +316,11 @@ export default {
             this.formData.imgUrl = ''
           })
       }  
-    }
+    },
+    allowedDates (value) {
+      const now = new Date().toISOString().substr(0, 10)
+      return value >= now
+    },
   }
 }
 </script>

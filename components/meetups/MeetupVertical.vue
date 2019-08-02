@@ -12,7 +12,8 @@
             <v-card-title primary-title class="text-xs-center">
               <div>
                 <h3 class="headline mb-0">{{ meetup.title }}</h3>
-                <div class="caption grey--text lighten-1">{{ meetup.location }}</div>
+                <div class="title primary--text my-2">{{ meetup.location }}</div>
+                <div>{{ meetup.date | date }} at {{ meetup.time }}</div>
               </div>
             </v-card-title>
           </v-flex>
@@ -29,7 +30,7 @@
               Cancel
             </v-btn>
             <template v-if="isLoggedIn">
-              <v-btn v-if="user.id === meetup.userId" flat color="success">
+              <v-btn v-if="user.id === meetup.userId" flat color="success" @click="$router.push('/admin/meetups/' + meetup.id)">
                 <v-icon left>edit</v-icon>
                 Edit
               </v-btn>
