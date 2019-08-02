@@ -1,16 +1,16 @@
 <template>
   <div>
-    <Detail :meetup="meetup" />
+    <MeetupVertical :meetup="meetup" />
   </div>
 </template>
 
 <script>
-import Detail from '@/components/meetups/Detail'
+import MeetupVertical from '@/components/meetups/MeetupVertical'
 import { fireDb } from '@/plugins/firebase.js'
 
 export default {
   components: {
-    Detail
+    MeetupVertical
   },
   asyncData (context) {
     return fireDb.collection("meetups").doc(context.params.id).get()
