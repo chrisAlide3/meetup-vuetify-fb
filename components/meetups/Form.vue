@@ -106,17 +106,27 @@
                   </v-flex>
               </v-layout>
 
-              <v-layout row justify-center>
+              <v-layout row justify-center class="mt-3">
                 <v-flex xs12 sm10>
                   <v-btn 
                     color="success" 
-                    depressed
+                    flat
                     round
                     :loading="loading.includes('save')"
                     :disabled="!valid"
                     @click="save"
-                  >Save
-                </v-btn>
+                  >
+                    <v-icon left>save</v-icon>
+                  Save
+                  </v-btn>
+                  <v-btn
+                    depressed
+                    round
+                    @click="$router.go(-1)"
+                  >
+                    <v-icon left>cancel</v-icon>
+                  Cancel
+                  </v-btn>
                 </v-flex>
 
               </v-layout>
