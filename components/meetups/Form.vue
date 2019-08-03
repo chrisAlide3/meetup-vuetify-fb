@@ -36,8 +36,30 @@
                     :rules="locationRules"
                     label="Location"
                     required
+                    @click="showMap=true"
                   >
                   </v-text-field>
+                </v-flex>
+              </v-layout>
+
+              <v-layout row justify-center v-if="showMap">
+                <v-flex xs12 sm10>
+                  <MglMap id="map" 
+                    :accessToken="accessToken" 
+                    :mapStyle="mapStyle"
+                    :center="coordinates"
+                    :zoom="10"
+                    @load="loadMap"
+                  >
+                    <MglMarker :coordinates="coordinates">
+                      <v-icon color="red" slot="marker">place</v-icon>
+                    </MglMarker>
+                    <MglNavigationControl position="top-right"/>
+                    <MglGeolocateControl position="top-right" />
+                    <MglPopup :showed="true" :coordinates="coordinates" anchor="top">
+                      <v-card> <div>Hello, I'm popup!</div> </v-card>
+                    </MglPopup>
+                  </MglMap>
                 </v-flex>
               </v-layout>
 
@@ -188,8 +210,21 @@
 </template>
 
 <script>
+import Mapbox from "mapbox-gl"
+import { MglMap, MglNavigationControl, MglGeolocateControl, MglMarker, MglPopup } from "vue-mapbox"
+
 export default {
+  components: {
+    MglMap,
+    MglNavigationControl,
+    MglGeolocateControl,
+    MglMarker,
+    MglPopup
+  },
   created () {
+    // We need to set mapbox-gl library here in order to use it in template
+    this.mapbox = Mapbox
+
     if (this.meetup) {
       this.formData.title = this.meetup.title,
       this.formData.location = this.meetup.location
@@ -211,6 +246,11 @@ export default {
       dateMenu: false,
       // Timepicker as Menu
       timeMenu: false,
+      // VueMapbox
+      showMap: false,
+      accessToken: 'pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ', // your access token. Needed if you using Mapbox maps
+      mapStyle: 'mapbox://styles/mapbox/streets-v9', // your map style
+      coordinates: [115.1571983, -8.7179646],
 
       titleRules: [
         v => !!v || 'Title is required',
@@ -259,6 +299,11 @@ export default {
     },
   },
   methods: {
+    loadMap (map) {
+      console.log('Map object', map)
+      console.log(map.component.center)
+      // :center="[115.1571983, -8.7179646]"
+    },
     save () {
       const payload = {
         formData: this.formData,
@@ -324,3 +369,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  #map {
+    height: 300px
+  }
+</style>

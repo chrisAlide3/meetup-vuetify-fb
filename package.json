@@ -17,7 +17,9 @@
     "@nuxtjs/vuetify": "0.5.5",
     "cookie-universal-nuxt": "^2.0.17",
     "firebase": "^6.3.0",
-    "nuxt": "^2.0.0"
+    "mapbox-gl": "^1.2.0",
+    "nuxt": "^2.0.0",
+    "vue-mapbox": "^0.4.1"
   },
   "devDependencies": {
     "@nuxtjs/eslint-config": "^0.0.1",
