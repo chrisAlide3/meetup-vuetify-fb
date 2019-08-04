@@ -32,10 +32,9 @@
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
                   <v-text-field
-                    v-model="formData.location"
-                    :rules="locationRules"
                     label="Location"
-                    required
+                    readonly
+                    :value="locationName"
                     @click="showMap=true"
                   >
                   </v-text-field>
@@ -44,22 +43,7 @@
 
               <v-layout row justify-center v-if="showMap">
                 <v-flex xs12 sm10>
-                  <MglMap id="map" 
-                    :accessToken="accessToken" 
-                    :mapStyle="mapStyle"
-                    :center="coordinates"
-                    :zoom="10"
-                    @load="loadMap"
-                  >
-                    <MglMarker :coordinates="coordinates">
-                      <v-icon color="red" slot="marker">place</v-icon>
-                    </MglMarker>
-                    <MglNavigationControl position="top-right"/>
-                    <MglGeolocateControl position="top-right" />
-                    <MglPopup :showed="true" :coordinates="coordinates" anchor="top">
-                      <v-card> <div>Hello, I'm popup!</div> </v-card>
-                    </MglPopup>
-                  </MglMap>
+                  <MapboxComponent @mapLocation="setLocation"/>
                 </v-flex>
               </v-layout>
 
@@ -210,21 +194,13 @@
 </template>
 
 <script>
-import Mapbox from "mapbox-gl"
-import { MglMap, MglNavigationControl, MglGeolocateControl, MglMarker, MglPopup } from "vue-mapbox"
+import MapboxComponent from '~/components/mapbox'
 
 export default {
   components: {
-    MglMap,
-    MglNavigationControl,
-    MglGeolocateControl,
-    MglMarker,
-    MglPopup
+    MapboxComponent,
   },
   created () {
-    // We need to set mapbox-gl library here in order to use it in template
-    this.mapbox = Mapbox
-
     if (this.meetup) {
       this.formData.title = this.meetup.title,
       this.formData.location = this.meetup.location
@@ -239,6 +215,8 @@ export default {
   data () {
     return {
       valid: false,
+      showMap: false,
+      locationName: '',
       // Picker full display
       landscape: true,
       reactive: false,
@@ -246,11 +224,6 @@ export default {
       dateMenu: false,
       // Timepicker as Menu
       timeMenu: false,
-      // VueMapbox
-      showMap: false,
-      accessToken: 'pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ', // your access token. Needed if you using Mapbox maps
-      mapStyle: 'mapbox://styles/mapbox/streets-v9', // your map style
-      coordinates: [115.1571983, -8.7179646],
 
       titleRules: [
         v => !!v || 'Title is required',
@@ -264,7 +237,7 @@ export default {
 
       formData: {
         title: '',
-        location: '',
+        location: [],
         description: '',
         date: new Date().toISOString().substr(0, 10),
         time: '00:00',
@@ -284,7 +257,10 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
-    }, 
+    },
+    // locationName () {
+    //   return this.$store.getters.locationName
+    // },
     checkDate () {
       const now = new Date()
       const enteredDate = new Date(this.formData.date)
@@ -299,10 +275,15 @@ export default {
     },
   },
   methods: {
-    loadMap (map) {
-      console.log('Map object', map)
-      console.log(map.component.center)
-      // :center="[115.1571983, -8.7179646]"
+    setLocation (coordinates) {
+      this.formData.location = coordinates
+      return this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + coordinates + '.json?access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
+      .then(data => {
+          this.locationName = data.features[0].place_name
+        })
+        .catch(err => {
+          console.error(err)
+        })     
     },
     save () {
       const payload = {
