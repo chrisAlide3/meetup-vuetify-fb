@@ -90,7 +90,6 @@ export default {
       // Dialog Data
       dialog: false,
       dialogMeetup: {},
-      dialogResponse: ''
     }
   },
   computed: {

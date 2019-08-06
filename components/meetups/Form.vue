@@ -1,5 +1,24 @@
 <template>
   <v-container>
+    <!-- Dialog for Map -->
+    <v-layout row justify-center v-if="showMap">
+      <v-dialog v-model="dialog" max-width="800">
+        <template v-slot:activator="{ on }">
+          <!-- <v-btn color="primary" dark v-on="on">Open Dialog</v-btn> -->
+        </template>
+        <v-card>
+          <v-card-text>
+            <SetMap :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-2" flat @click="dialog=false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
+
+
     <v-layout row justify-center>
       <v-flex xs12 sm8>
         <v-card>
@@ -32,14 +51,20 @@
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
                   <v-text-field
-                    v-model="formData.location"
-                    :rules="locationRules"
                     label="Location"
-                    required
+                    readonly
+                    :value="locationName"
+                    @click="openMapDialog"
                   >
                   </v-text-field>
                 </v-flex>
               </v-layout>
+
+              <!-- <v-layout row justify-center v-if="showMap">
+                <v-flex xs12 sm10>
+                  <SetMap :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
+                </v-flex>
+              </v-layout> -->
 
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
@@ -188,8 +213,16 @@
 </template>
 
 <script>
+import SetMap from '~/components/global/SetMap'
+import { mapboxConfig } from '~/.config.js'
+
 export default {
+  components: {
+    SetMap,
+  },
   created () {
+    this.getCurrentLocation()
+
     if (this.meetup) {
       this.formData.title = this.meetup.title,
       this.formData.location = this.meetup.location
@@ -199,14 +232,23 @@ export default {
       this.formData.userId = this.meetup.userId,
       this.formData.imgName = this.meetup.imgName,
       this.formData.imgUrl = this.meetup.imgUrl
+
+      if (this.formData.location.length > 0) {
+        this.getLocationName()
+      }
     }
   },
   data () {
     return {
       valid: false,
-      // Picker full display
-      landscape: true,
-      reactive: false,
+      showMap: false,
+      locationName: '',
+      userPosition: [],
+      mapPosition: [],
+      accessToken: mapboxConfig.accessToken,
+      // Dialog Data
+      dialog: false,
+      dialogMeetup: {},
       // Datepicker as Menu
       dateMenu: false,
       // Timepicker as Menu
@@ -224,7 +266,7 @@ export default {
 
       formData: {
         title: '',
-        location: '',
+        location: [],
         description: '',
         date: new Date().toISOString().substr(0, 10),
         time: '00:00',
@@ -244,7 +286,7 @@ export default {
   computed: {
     loading () {
       return this.$store.getters.loading
-    }, 
+    },
     checkDate () {
       const now = new Date()
       const enteredDate = new Date(this.formData.date)
@@ -259,6 +301,36 @@ export default {
     },
   },
   methods: {
+    openMapDialog () {
+      this.showMap = true
+      this.dialog=true
+    },
+    getCurrentLocation () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(this.setCurrentPosition)
+      }
+    },
+    setCurrentPosition (position) {
+      const long = position.coords.longitude
+      const lat = position.coords.latitude
+      this.userPosition = [long, lat]
+      this.mapPosition = [long, lat]
+    },
+    setLocation (payload) {
+      if (payload.coordinates === this.userPosition) {
+        this.formData.location = []
+      } else {
+        this.formData.location = payload.coordinates
+      }
+      this.mapPosition = payload.coordinates
+      this.locationName = payload.location     
+    },
+    getLocationName () {
+      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + this.formData.location + '.json?access_token=' + this.accessToken)
+        .then(data => {
+          this.locationName = data.features[0].place_name
+        })
+    },
     save () {
       const payload = {
         formData: this.formData,
@@ -324,3 +396,9 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  #map {
+    height: 300px
+  }
+</style>
