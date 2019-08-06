@@ -77,7 +77,6 @@ export default {
   },
 
   created () {
-    this.getCurrentLocation()
     this.mapbox = Mapbox
   },
   data() {
@@ -85,8 +84,8 @@ export default {
       accessToken: 'pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ', // your access token. Needed if you using Mapbox maps,
       mapStyle: 'mapbox://styles/mapbox/streets-v9',
       // coordinates: [115.1571983, -8.7179646],
-      userPosition: [],
-      coordinates: [0, 0],
+      // userPosition: [],
+      // coordinates: [0, 0],
       markerCoordinates: [],
       zoom: 1,
       // Autocomplete
@@ -96,6 +95,16 @@ export default {
       select: null,
 
       selectedLocation: ''
+    }
+  },
+  props: {
+    userPosition: {
+      type: Array,
+      required: true
+    },
+    coordinates: {
+      type: Array,
+      required: true
     }
   },
   watch: {
@@ -111,19 +120,6 @@ export default {
     }
   },
   methods: {
-    getCurrentLocation () {
-      console.log('getCurrentLocation')
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(this.setCurrentPosition)
-      }
-    },
-    setCurrentPosition (position) {
-      console.log('setCurrentPosition', position)
-      const long = position.coords.longitude
-      const lat = position.coords.latitude
-      this.userPosition = [long, lat]
-      this.coordinates = [long, lat]
-    },
     querySelections (v) {
       this.loading = true
       // Simulated ajax query
@@ -146,7 +142,7 @@ export default {
     setMarker (map) {
       console.log('setMarker', map)
       const coordinates = [map.mapboxEvent.lngLat.lng, map.mapboxEvent.lngLat.lat]
-      this.coordinates = coordinates
+      // this.coordinates = coordinates
       this.markerCoordinates = coordinates
       this.zoom = 14
       this.getLocation(coordinates)
@@ -167,7 +163,7 @@ export default {
           this.zoom = 12
           const coordinates = data.features[0].center
           this.markerCoordinates = coordinates
-          this.coordinates = coordinates
+          // this.coordinates = coordinates
 
           const payload = {
             coordinates: coordinates,
@@ -186,8 +182,10 @@ export default {
     },
     clearLocation () {
       this.selectedLocation = ''
+      this.zoom = 1
+      this.markerCoordinates = []
       const payload = {
-        coordinates: [],
+        coordinates: this.userPosition,
         location: ''
       }
       this.$emit('mapLocation', payload)

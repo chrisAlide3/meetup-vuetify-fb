@@ -39,11 +39,12 @@
                   >
                   </v-text-field>
                 </v-flex>
+                <p>formData.location {{ formData.location }}</p>
               </v-layout>
 
               <v-layout row justify-center v-if="showMap">
                 <v-flex xs12 sm10>
-                  <MapboxComponent @mapLocation="setLocation"/>
+                  <MapboxComponent :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
                 </v-flex>
               </v-layout>
 
@@ -201,6 +202,8 @@ export default {
     MapboxComponent,
   },
   created () {
+    this.getCurrentLocation()
+
     if (this.meetup) {
       this.formData.title = this.meetup.title,
       this.formData.location = this.meetup.location
@@ -217,6 +220,9 @@ export default {
       valid: false,
       showMap: false,
       locationName: '',
+      userPosition: [],
+      mapPosition: [],
+
       // Datepicker as Menu
       dateMenu: false,
       // Timepicker as Menu
@@ -272,8 +278,24 @@ export default {
     },
   },
   methods: {
+    getCurrentLocation () {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(this.setCurrentPosition)
+      }
+    },
+    setCurrentPosition (position) {
+      const long = position.coords.longitude
+      const lat = position.coords.latitude
+      this.userPosition = [long, lat]
+      this.mapPosition = [long, lat]
+    },
     setLocation (payload) {
-      this.formData.location = payload.coordinates
+      if (payload.coordinates === this.userPosition) {
+        this.formData.location = []
+      } else {
+        this.formData.location = payload.coordinates
+      }
+      this.mapPosition = payload.coordinates
       this.locationName = payload.location     
     },
     save () {
