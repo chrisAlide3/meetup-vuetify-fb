@@ -214,6 +214,7 @@
 
 <script>
 import SetMap from '~/components/global/SetMap'
+import { mapboxConfig } from '~/.config.js'
 
 export default {
   components: {
@@ -231,6 +232,10 @@ export default {
       this.formData.userId = this.meetup.userId,
       this.formData.imgName = this.meetup.imgName,
       this.formData.imgUrl = this.meetup.imgUrl
+
+      if (this.formData.location.length > 0) {
+        this.getLocationName()
+      }
     }
   },
   data () {
@@ -240,6 +245,7 @@ export default {
       locationName: '',
       userPosition: [],
       mapPosition: [],
+      accessToken: mapboxConfig.accessToken,
       // Dialog Data
       dialog: false,
       dialogMeetup: {},
@@ -318,6 +324,12 @@ export default {
       }
       this.mapPosition = payload.coordinates
       this.locationName = payload.location     
+    },
+    getLocationName () {
+      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + this.formData.location + '.json?access_token=' + this.accessToken)
+        .then(data => {
+          this.locationName = data.features[0].place_name
+        })
     },
     save () {
       const payload = {
