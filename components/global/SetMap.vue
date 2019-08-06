@@ -10,7 +10,7 @@
         </v-text-field>
       </v-flex>
       <v-flex xs1 shrink align-self-center>
-        <v-icon @click="clearLocation">cancel</v-icon>
+        <v-icon color="red" @click="clearLocation">cancel</v-icon>
       </v-flex>
     </v-layout>
     <v-layout row class="mb-2">

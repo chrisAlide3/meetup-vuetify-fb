@@ -1,5 +1,24 @@
 <template>
   <v-container>
+    <!-- Dialog for Map -->
+    <v-layout row justify-center v-if="showMap">
+      <v-dialog v-model="dialog" max-width="800">
+        <template v-slot:activator="{ on }">
+          <!-- <v-btn color="primary" dark v-on="on">Open Dialog</v-btn> -->
+        </template>
+        <v-card>
+          <v-card-text>
+            <SetMap :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="green darken-2" flat @click="dialog=false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
+
+
     <v-layout row justify-center>
       <v-flex xs12 sm8>
         <v-card>
@@ -35,17 +54,17 @@
                     label="Location"
                     readonly
                     :value="locationName"
-                    @click="showMap=true"
+                    @click="openMapDialog"
                   >
                   </v-text-field>
                 </v-flex>
               </v-layout>
 
-              <v-layout row justify-center v-if="showMap">
+              <!-- <v-layout row justify-center v-if="showMap">
                 <v-flex xs12 sm10>
                   <SetMap :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
                 </v-flex>
-              </v-layout>
+              </v-layout> -->
 
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
@@ -221,7 +240,9 @@ export default {
       locationName: '',
       userPosition: [],
       mapPosition: [],
-
+      // Dialog Data
+      dialog: false,
+      dialogMeetup: {},
       // Datepicker as Menu
       dateMenu: false,
       // Timepicker as Menu
@@ -274,6 +295,10 @@ export default {
     },
   },
   methods: {
+    openMapDialog () {
+      this.showMap = true
+      this.dialog=true
+    },
     getCurrentLocation () {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(this.setCurrentPosition)
