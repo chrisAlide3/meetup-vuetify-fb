@@ -39,12 +39,11 @@
                   >
                   </v-text-field>
                 </v-flex>
-                <p>formData.location {{ formData.location }}</p>
               </v-layout>
 
               <v-layout row justify-center v-if="showMap">
                 <v-flex xs12 sm10>
-                  <MapboxComponent :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
+                  <SetMap :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
                 </v-flex>
               </v-layout>
 
@@ -195,11 +194,11 @@
 </template>
 
 <script>
-import MapboxComponent from '~/components/mapbox'
+import SetMap from '~/components/global/SetMap'
 
 export default {
   components: {
-    MapboxComponent,
+    SetMap,
   },
   created () {
     this.getCurrentLocation()
@@ -261,9 +260,6 @@ export default {
     loading () {
       return this.$store.getters.loading
     },
-    // locationName () {
-    //   return this.$store.getters.locationName
-    // },
     checkDate () {
       const now = new Date()
       const enteredDate = new Date(this.formData.date)

@@ -1,6 +1,5 @@
 <template>
   <v-container>
-    <p>userPosition {{ userPosition }}</p>
     <v-layout row v-if="selectedLocation !== ''">
       <v-flex xs11>
         <v-text-field
@@ -38,7 +37,6 @@
           :mapStyle="mapStyle"
           :center="coordinates"
           :zoom="zoom"
-          @load="loadMap"
           @click="setMarker"
         >
           <MglMarker v-if="markerCoordinates.length>0" :coordinates="markerCoordinates">
@@ -81,11 +79,8 @@ export default {
   },
   data() {
     return {
-      accessToken: 'pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ', // your access token. Needed if you using Mapbox maps,
+      accessToken: 'pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ',
       mapStyle: 'mapbox://styles/mapbox/streets-v9',
-      // coordinates: [115.1571983, -8.7179646],
-      // userPosition: [],
-      // coordinates: [0, 0],
       markerCoordinates: [],
       zoom: 1,
       // Autocomplete
@@ -122,10 +117,11 @@ export default {
   methods: {
     querySelections (v) {
       this.loading = true
-      // Simulated ajax query
-      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + v + '.json?access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
+      const long = this.userPosition[0]
+      const lat = this.userPosition[1]
+      console.log('long/lat: ', long + '/' + lat)
+      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + v + '.json?proximity=' + long + ',' + lat + '&access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
         .then(data => {
-          console.log('getLocations: ', data)          
           data.features.forEach(element => {
             this.locations.push(element.place_name)
           })
@@ -133,21 +129,12 @@ export default {
           this.loading = false
         })
     },
-    loadMap (map) {
-      console.log('loadMap map: ', map)
-      console.log('loadMap center', map.component.center)
-      // console.log(map.component.center)
-      // :center="[115.1571983, -8.7179646]"
-    },
     setMarker (map) {
-      console.log('setMarker', map)
       const coordinates = [map.mapboxEvent.lngLat.lng, map.mapboxEvent.lngLat.lat]
-      // this.coordinates = coordinates
       this.markerCoordinates = coordinates
       this.zoom = 14
       this.getLocation(coordinates)
         .then((location) => {
-          console.log('getLocation in Marker: ', location)
           this.selectedLocation = location
           const payload = {
             coordinates: coordinates,
@@ -157,13 +144,15 @@ export default {
         })
     },
     getCoordinates (location) {
-      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + location + '.json?access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
+      const long = this.userPosition[0]
+      const lat = this.userPosition[1]
+      console.log('long/lat: ', long + '/' + lat)
+
+      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + location + '.json?proximity=' + long + ',' + lat + '&access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
         .then(data => {
-          console.log('getCoordinates: ', data)
           this.zoom = 12
           const coordinates = data.features[0].center
           this.markerCoordinates = coordinates
-          // this.coordinates = coordinates
 
           const payload = {
             coordinates: coordinates,
@@ -176,7 +165,6 @@ export default {
     getLocation (coordinates) {
       return this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + coordinates + '.json?access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
         .then(data => {
-          console.log('getLocation: ', data)
           return data.features[0].place_name
         })
     },
