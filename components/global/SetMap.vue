@@ -52,6 +52,7 @@
 </template>
 
 <script>
+import { mapboxConfig } from '~/.config.js'
 import Mapbox from "mapbox-gl"
 
 import {
@@ -79,7 +80,7 @@ export default {
   },
   data() {
     return {
-      accessToken: 'pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ',
+      accessToken: mapboxConfig.accessToken,
       mapStyle: 'mapbox://styles/mapbox/streets-v9',
       markerCoordinates: [],
       zoom: 1,
@@ -120,7 +121,7 @@ export default {
       const long = this.userPosition[0]
       const lat = this.userPosition[1]
       console.log('long/lat: ', long + '/' + lat)
-      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + v + '.json?proximity=' + long + ',' + lat + '&access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
+      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + v + '.json?proximity=' + long + ',' + lat + '&access_token=' + this.accessToken)
         .then(data => {
           data.features.forEach(element => {
             this.locations.push(element.place_name)
@@ -148,7 +149,7 @@ export default {
       const lat = this.userPosition[1]
       console.log('long/lat: ', long + '/' + lat)
 
-      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + location + '.json?proximity=' + long + ',' + lat + '&access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
+      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + location + '.json?proximity=' + long + ',' + lat + '&access_token=' + this.accessToken)
         .then(data => {
           this.zoom = 12
           const coordinates = data.features[0].center
@@ -163,7 +164,7 @@ export default {
         })
     },
     getLocation (coordinates) {
-      return this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + coordinates + '.json?access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
+      return this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + coordinates + '.json?access_token=' + this.accessToken)
         .then(data => {
           return data.features[0].place_name
         })
