@@ -217,9 +217,6 @@ export default {
       valid: false,
       showMap: false,
       locationName: '',
-      // Picker full display
-      landscape: true,
-      reactive: false,
       // Datepicker as Menu
       dateMenu: false,
       // Timepicker as Menu
@@ -275,15 +272,9 @@ export default {
     },
   },
   methods: {
-    setLocation (coordinates) {
-      this.formData.location = coordinates
-      return this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + coordinates + '.json?access_token=pk.eyJ1Ijoia3Jpc3BlZSIsImEiOiJjanl0dmx6ZmQwNHJ6M21wOWRtd3JwNnB4In0.wJM9noKDuLr_rtWYJfdpHQ')
-      .then(data => {
-          this.locationName = data.features[0].place_name
-        })
-        .catch(err => {
-          console.error(err)
-        })     
+    setLocation (payload) {
+      this.formData.location = payload.coordinates
+      this.locationName = payload.location     
     },
     save () {
       const payload = {
