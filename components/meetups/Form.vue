@@ -364,9 +364,9 @@ export default {
         this.formData.location.coordinates = []
       } else {
         this.formData.location.coordinates = payload.coordinates
-        this.formData.location.name = payload.location
-        this.formData.location.locality = payload.locality
       }
+      this.formData.location.name = payload.location
+      this.formData.location.locality = payload.locality
       this.mapPosition = payload.coordinates
     },
     // getLocationName () {
