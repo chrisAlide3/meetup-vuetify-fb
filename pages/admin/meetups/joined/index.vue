@@ -100,9 +100,14 @@ export default {
       return this.$store.getters.searchString
     },
     meetups () {
-      const joinedMeetups = this.$store.getters.meetups.filter(e => {
+      let joinedMeetups = []
+      if (this.$store.meetups.length > 0) {
+        joinedMeetups = this.$store.getters.meetups.filter(e => {
         return this.user.registeredMeetups.includes(e.id)
-      })
+        })
+      } else {
+        return joinedMeetups
+      }
 
       if (this.searchString === '') {
         return joinedMeetups

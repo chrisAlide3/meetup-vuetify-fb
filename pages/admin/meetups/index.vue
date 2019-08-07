@@ -42,9 +42,14 @@ export default {
       return this.$store.getters.searchString
     },
     meetups () {
-      const meetupsFromUser = this.$store.getters.meetups.filter(meetup => {
-        return meetup.userId == this.user.id
-      })
+      let meetupsFromUser = []
+      if (this.$store.meetups.length > 0) {
+        meetupsFromUser = this.$store.getters.meetups.filter(meetup => {
+          return meetup.userId == this.user.id
+        })
+      } else {
+        return meetupsFromUser
+      } 
 
       if (this.searchString === '') {
         return meetupsFromUser
