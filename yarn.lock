@@ -8913,11 +8913,6 @@ vue-loader@^15.7.0:
     vue-hot-reload-api "^2.3.0"
     vue-style-loader "^4.1.0"
 
-vue-mapbox-geocoder@^0.2.0:
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/vue-mapbox-geocoder/-/vue-mapbox-geocoder-0.2.0.tgz#8d669edaf7048c33c77da5fc0733ff1399be3327"
-  integrity sha512-TdeNl93/7BSzyFIdcUxq+vtbrvQ7QwP7eKmB0NAESjCfsQTtv9wUzH4FImJS0h6+IEOIrMAaK0BAi5E5S8POEg==
-
 vue-mapbox@^0.4.1:
   version "0.4.1"
   resolved "https://registry.yarnpkg.com/vue-mapbox/-/vue-mapbox-0.4.1.tgz#c1cac11c33c46a78a2b58797686371a4c32ffb4a"

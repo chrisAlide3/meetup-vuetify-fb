@@ -1,7 +1,7 @@
 <template>
   <v-container>
     <!-- Dialog for Map -->
-    <v-layout row justify-center v-if="showMap">
+    <v-layout row justify-center v-if="showMap && browser">
       <v-dialog v-model="dialog" max-width="800">
         <template v-slot:activator="{ on }">
           <!-- <v-btn color="primary" dark v-on="on">Open Dialog</v-btn> -->
@@ -221,6 +221,9 @@ export default {
     SetMap,
   },
   created () {
+    if (process.browser) {
+      this.browser = true
+    }
     this.getCurrentLocation()
 
     if (this.meetup) {
@@ -243,6 +246,7 @@ export default {
       mapPosition: [],
       accessToken: mapboxConfig.accessToken,
       // Dialog Data
+      browser: false,
       dialog: false,
       dialogMeetup: {},
       // Datepicker as Menu

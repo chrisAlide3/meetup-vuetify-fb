@@ -54,16 +54,12 @@
 
 <script>
 import { mapboxConfig } from '~/.config.js'
-// import Mapbox from "mapbox-gl"
-
 import {
   MglMap,
   MglMarker,
   MglNavigationControl,
   MglGeolocateControl
 } from 'vue-mapbox'
-
-import MglGeocoderControl from 'vue-mapbox-geocoder'
 
 export default {
   name: 'App',
@@ -73,12 +69,12 @@ export default {
     MglMarker,
     MglNavigationControl,
     MglGeolocateControl,
-    MglGeocoderControl
   },
 
   created () {
-    // this.mapbox = Mapbox
-    this.createMap()
+    if (process.browser) {
+      this.createMap()
+    }
     this.selectedLocation = this.locationName
   },
   data() {
@@ -115,7 +111,6 @@ export default {
       val && val !== this.select && this.querySelections(val)
     },
     select (val) {
-      console.log('selectWatcher: ', val)
       if (val !== null) {
         this.selectedLocation = val
         this.getCoordinates(val)
@@ -127,7 +122,6 @@ export default {
       this.loading = true
       const long = this.userPosition[0]
       const lat = this.userPosition[1]
-      console.log('long/lat: ', long + '/' + lat)
       this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + v + '.json?proximity=' + long + ',' + lat + '&access_token=' + this.accessToken)
         .then(data => {
           data.features.forEach(element => {
@@ -142,8 +136,6 @@ export default {
       this.mapbox = Mapbox
     },
     loadMap (map) {
-      console.log('loadMap', map)
-      console.log('userpos/coordinates:', this.userPosition + '/' + this.coordinates)
       let same = true
       for (let index = 0; index < this.userPosition.length; index++) {
         if (this.userPosition[index] !== this.coordinates[index]) {
@@ -175,11 +167,9 @@ export default {
     getCoordinates (location) {
       const long = this.userPosition[0]
       const lat = this.userPosition[1]
-      console.log('long/lat: ', long + '/' + lat)
 
       this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + location + '.json?proximity=' + long + ',' + lat + '&access_token=' + this.accessToken)
         .then(data => {
-          console.log('getCoordinates', data.features)
           let locality = ''
           this.zoom = 12
           const coordinates = data.features[0].center
