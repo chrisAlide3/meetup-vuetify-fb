@@ -43,7 +43,7 @@ export default {
     },
     meetups () {
       let meetupsFromUser = []
-      if (this.$store.meetups.length > 0) {
+      if (this.$store.getters.meetups.length > 0) {
         meetupsFromUser = this.$store.getters.meetups.filter(meetup => {
           return meetup.userId == this.user.id
         })

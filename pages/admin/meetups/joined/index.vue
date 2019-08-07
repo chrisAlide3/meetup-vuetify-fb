@@ -101,20 +101,22 @@ export default {
     },
     meetups () {
       let joinedMeetups = []
-      if (this.$store.meetups.length > 0) {
-        joinedMeetups = this.$store.getters.meetups.filter(e => {
-        return this.user.registeredMeetups.includes(e.id)
-        })
-      } else {
-        return joinedMeetups
-      }
+      if (this.user) {
+        if (this.user.registeredMeetups.length > 0) {
+          joinedMeetups = this.$store.getters.meetups.filter(e => {
+          return this.user.registeredMeetups.includes(e.id)
+          })
+        } else {
+          return joinedMeetups
+        }
 
-      if (this.searchString === '') {
-        return joinedMeetups
-      } else {
-        return joinedMeetups.filter(meetup => {
-          return meetup.title.toUpperCase().includes(this.searchString.toUpperCase())
-        })
+        if (this.searchString === '') {
+          return joinedMeetups
+        } else {
+          return joinedMeetups.filter(meetup => {
+            return meetup.title.toUpperCase().includes(this.searchString.toUpperCase())
+          })
+        }
       }
     }
   },
