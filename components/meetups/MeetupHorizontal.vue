@@ -12,7 +12,7 @@
             :src="meetup.imgUrl"
             height="120px"
             >
-            <div class="caption red--text darken-2 font-weight-bold ml-2">{{ meetup.location }}</div>
+            <div class="caption red--text darken-2 font-weight-bold ml-2">{{ meetup.location.locality }}</div>
             </v-img>
           </v-layout>
         </v-flex>

@@ -8,7 +8,7 @@
         </template>
         <v-card>
           <v-card-text>
-            <SetMap :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
+            <SetMap :userPosition="userPosition" :coordinates="mapPosition" :locationName="formData.location.name" @mapLocation="setLocation"/>
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -53,7 +53,7 @@
                   <v-text-field
                     label="Location"
                     readonly
-                    :value="locationName"
+                    :value="formData.location.name"
                     @click="openMapDialog"
                   >
                   </v-text-field>
@@ -233,9 +233,6 @@ export default {
       this.formData.imgName = this.meetup.imgName,
       this.formData.imgUrl = this.meetup.imgUrl
 
-      if (this.formData.location.length > 0) {
-        this.getLocationName()
-      }
     }
   },
   data () {
@@ -266,7 +263,11 @@ export default {
 
       formData: {
         title: '',
-        location: [],
+        location: {
+          name: '',
+          coordinates: [],
+          locality: ''
+        },
         description: '',
         date: new Date().toISOString().substr(0, 10),
         time: '00:00',
@@ -318,19 +319,20 @@ export default {
     },
     setLocation (payload) {
       if (payload.coordinates === this.userPosition) {
-        this.formData.location = []
+        this.formData.location.coordinates = []
       } else {
-        this.formData.location = payload.coordinates
+        this.formData.location.coordinates = payload.coordinates
+        this.formData.location.name = payload.location
+        this.formData.location.locality = payload.locality
       }
       this.mapPosition = payload.coordinates
-      this.locationName = payload.location     
     },
-    getLocationName () {
-      this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + this.formData.location + '.json?access_token=' + this.accessToken)
-        .then(data => {
-          this.locationName = data.features[0].place_name
-        })
-    },
+    // getLocationName () {
+    //   this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + this.formData.location + '.json?access_token=' + this.accessToken)
+    //     .then(data => {
+    //       this.locationName = data.features[0].place_name
+    //     })
+    // },
     save () {
       const payload = {
         formData: this.formData,

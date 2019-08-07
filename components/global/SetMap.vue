@@ -37,6 +37,7 @@
           :mapStyle="mapStyle"
           :center="coordinates"
           :zoom="zoom"
+          @load="loadMap"
           @click="setMarker"
         >
           <MglMarker v-if="markerCoordinates.length>0" :coordinates="markerCoordinates">
@@ -77,6 +78,7 @@ export default {
 
   created () {
     this.mapbox = Mapbox
+    this.selectedLocation = this.locationName
   },
   data() {
     return {
@@ -100,6 +102,10 @@ export default {
     },
     coordinates: {
       type: Array,
+      required: true
+    },
+    locationName: {
+      type: String,
       required: true
     }
   },
@@ -130,18 +136,27 @@ export default {
           this.loading = false
         })
     },
+    loadMap (map) {
+      console.log('loadMap', map)
+      if (this.userPosition !== this.coordinates) {
+        this.zoom = 14
+        this.markerCoordinates = this.coordinates
+      }
+
+    },
     setMarker (map) {
       const coordinates = [map.mapboxEvent.lngLat.lng, map.mapboxEvent.lngLat.lat]
       this.markerCoordinates = coordinates
       this.zoom = 14
       this.getLocation(coordinates)
-        .then((location) => {
-          this.selectedLocation = location
-          const payload = {
+        .then((payload) => {
+          this.selectedLocation = payload.location
+          const payload1 = {
             coordinates: coordinates,
-            location: location
+            location: payload.location,
+            locality: payload.locality
           }
-          this.$emit('mapLocation', payload)
+          this.$emit('mapLocation', payload1)
         })
     },
     getCoordinates (location) {
@@ -151,13 +166,21 @@ export default {
 
       this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + location + '.json?proximity=' + long + ',' + lat + '&access_token=' + this.accessToken)
         .then(data => {
+          console.log('getCoordinates', data.features)
+          let locality = ''
           this.zoom = 12
           const coordinates = data.features[0].center
+          data.features.forEach(element => {
+            if (element.place_type === 'locality') {
+              locality = element.place_name
+            }
+          })
           this.markerCoordinates = coordinates
 
           const payload = {
             coordinates: coordinates,
-            location: location
+            location: location,
+            locality: locality
           }
           this.$emit('mapLocation', payload)
           this.select = null
@@ -166,7 +189,18 @@ export default {
     getLocation (coordinates) {
       return this.$axios.$get('https://api.mapbox.com/geocoding/v5/mapbox.places/' + coordinates + '.json?access_token=' + this.accessToken)
         .then(data => {
-          return data.features[0].place_name
+          const location = data.features[0].place_name
+          let locality = ''
+          data.features.forEach(element => {
+            if (element.place_type[0] === 'locality') {
+              locality = element.place_name
+            }
+          })
+          const payload = {
+            location: location, 
+            locality: locality
+          }
+          return payload
         })
     },
     clearLocation () {
@@ -175,7 +209,8 @@ export default {
       this.markerCoordinates = []
       const payload = {
         coordinates: this.userPosition,
-        location: ''
+        location: '',
+        locality: ''
       }
       this.$emit('mapLocation', payload)
     }
