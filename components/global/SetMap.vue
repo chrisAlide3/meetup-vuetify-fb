@@ -32,21 +32,24 @@
     
     <v-layout row>
       <v-flex xs12>
-        <MglMap id="map"
-          :accessToken="accessToken"
-          :mapStyle="mapStyle"
-          :center="coordinates"
-          :zoom="zoom"
-          @load="loadMap"
-          @click="setMarker"
-        >
-          <MglMarker v-if="markerCoordinates.length>0" :coordinates="markerCoordinates">
-            <v-icon color="red" slot="marker">place</v-icon>
-          </MglMarker>
+        <!-- Do not run on server. Mapbox can only render in client (see nuxt.config plugins) -->
+        <no-ssr>
+          <MglMap id="map"
+            :accessToken="accessToken"
+            :mapStyle="mapStyle"
+            :center="coordinates"
+            :zoom="zoom"
+            @load="loadMap"
+            @click="setMarker"
+          >
+            <MglMarker v-if="markerCoordinates.length>0" :coordinates="markerCoordinates">
+              <v-icon color="red" slot="marker">place</v-icon>
+            </MglMarker>
 
-          <MglNavigationControl position="top-right"/>
-          <MglGeolocateControl position="top-right" :trackUserLocation="true" />
-        </MglMap>
+            <MglNavigationControl position="top-right"/>
+            <MglGeolocateControl position="top-right" :trackUserLocation="true" />
+          </MglMap>
+        </no-ssr>
       </v-flex>
     </v-layout>
   </v-container>
@@ -54,27 +57,27 @@
 
 <script>
 import { mapboxConfig } from '~/.config.js'
-import {
-  MglMap,
-  MglMarker,
-  MglNavigationControl,
-  MglGeolocateControl
-} from 'vue-mapbox'
+// import {
+//   MglMap,
+//   MglMarker,
+//   MglNavigationControl,
+//   MglGeolocateControl
+// } from 'vue-mapbox'
 
 export default {
-  name: 'App',
+  // name: 'App',
 
-  components: {
-    MglMap,
-    MglMarker,
-    MglNavigationControl,
-    MglGeolocateControl,
-  },
+  // components: {
+  //   MglMap,
+  //   MglMarker,
+  //   MglNavigationControl,
+  //   MglGeolocateControl,
+  // },
 
   created () {
-    if (process.browser) {
-      this.createMap()
-    }
+    // if (process.browser) {
+    //   this.createMap()
+    // }
     this.selectedLocation = this.locationName
   },
   data() {
@@ -131,10 +134,10 @@ export default {
           this.loading = false
         })
     },
-    createMap () {
-      const Mapbox = require("mapbox-gl")
-      this.mapbox = Mapbox
-    },
+    // createMap () {
+    //   const Mapbox = require("mapbox-gl")
+    //   this.mapbox = Mapbox
+    // },
     loadMap (map) {
       let same = true
       for (let index = 0; index < this.userPosition.length; index++) {

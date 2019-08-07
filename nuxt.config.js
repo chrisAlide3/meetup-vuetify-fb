@@ -36,7 +36,8 @@ export default {
     '~plugins/firebase.js',
     '~plugins/firebaseAuth.js',
     '~plugins/core-components.js',
-    '~plugins/date-filter.js'
+    '~plugins/date-filter.js',
+    { src: '~/plugins/mapbox.js', mode: 'client' },
   ],
   /*
   ** Nuxt.js modules
