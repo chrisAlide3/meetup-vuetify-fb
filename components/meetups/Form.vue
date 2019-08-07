@@ -250,7 +250,9 @@ export default {
     if (process.browser) {
       this.browser = true
     }
-    this.getCurrentLocation()
+    if (process.client) {
+      this.getCurrentLocation()
+    }
 
     if (this.meetup) {
       this.formData.title = this.meetup.title

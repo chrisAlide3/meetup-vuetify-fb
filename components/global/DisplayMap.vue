@@ -12,6 +12,7 @@
     </v-layout>
     <v-layout row class="mb-2">
       <v-flex xs12>
+        <no-ssr>
         <MglMap id="map"
           :accessToken="accessToken"
           :mapStyle="mapStyle"
@@ -25,6 +26,7 @@
           <MglNavigationControl position="top-right"/>
           <MglGeolocateControl position="top-right" :trackUserLocation="true" />
         </MglMap>
+        </no-ssr>
       </v-flex>
     </v-layout>
   </v-container>
@@ -32,20 +34,8 @@
 
 <script>
 import { mapboxConfig } from '~/.config.js'
-import {
-  MglMap,
-  MglMarker,
-  MglNavigationControl,
-  MglGeolocateControl
-} from 'vue-mapbox'
 
 export default {
-  components: {
-    MglMap,
-    MglMarker,
-    MglNavigationControl,
-    MglGeolocateControl,
-  },
   data () {
     return {
       accessToken: mapboxConfig.accessToken,
@@ -60,18 +50,6 @@ export default {
     locationName: {
       type: String,
       required: true
-    }
-  },
-  created () {
-    if (process.browser) {
-      this.createMap()
-    }
-  },
-  methods: {
-    createMap () {
-      console.log('create map')
-      const Mapbox = require("mapbox-gl")
-      this.mapbox = Mapbox
     }
   }
 }
