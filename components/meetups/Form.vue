@@ -48,23 +48,49 @@
                 </v-flex>
               </v-layout>
 
-              <v-layout row justify-center>
-                <v-flex xs12 sm10>
+              <v-layout row justify-end>
+                <v-flex xs11 sm10>
                   <v-text-field
                     label="Location"
                     readonly
+                    :rules="checkLocation"
                     :value="formData.location.name"
                     @click="openMapDialog"
                   >
                   </v-text-field>
                 </v-flex>
+                <v-flex xs1 align-self-center>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <v-icon small v-on="on">help</v-icon>
+                    </template>
+                    <span>Choose a location on the map.</span>
+                    <br>
+                    <span>You can use the alternate location field to overwrite the map location text</span>
+                    <br>
+                    <span>If alternate location is set, it will be displayed instead of the map location</span>
+                  </v-tooltip>
+                </v-flex>
               </v-layout>
 
-              <!-- <v-layout row justify-center v-if="showMap">
-                <v-flex xs12 sm10>
-                  <SetMap :userPosition="userPosition" :coordinates="mapPosition" @mapLocation="setLocation"/>
+              <v-layout row justify-end>
+                <v-flex xs11 sm10>
+                  <v-text-field
+                    v-model="formData.alternateLocation"
+                    :rules="checkLocation"
+                    label="Alternate Location"
+                  >
+                  </v-text-field>
                 </v-flex>
-              </v-layout> -->
+                <v-flex xs1 align-self-center>
+                  <v-tooltip top>
+                    <template v-slot:activator="{ on }">
+                      <v-icon small v-on="on">help</v-icon>
+                    </template>
+                    <span>If provided, it will be the location displayed to users</span>
+                  </v-tooltip>
+                </v-flex>
+              </v-layout>
 
               <v-layout row justify-center>
                 <v-flex xs12 sm10>
@@ -227,13 +253,14 @@ export default {
     this.getCurrentLocation()
 
     if (this.meetup) {
-      this.formData.title = this.meetup.title,
+      this.formData.title = this.meetup.title
       this.formData.location = this.meetup.location
-      this.formData.description = this.meetup.description,
-      this.formData.date = this.meetup.date,
-      this.formData.time = this.meetup.time,
-      this.formData.userId = this.meetup.userId,
-      this.formData.imgName = this.meetup.imgName,
+      this.formData.alternateLocation = this.meetup.alternateLocation
+      this.formData.description = this.meetup.description
+      this.formData.date = this.meetup.date
+      this.formData.time = this.meetup.time
+      this.formData.userId = this.meetup.userId
+      this.formData.imgName = this.meetup.imgName
       this.formData.imgUrl = this.meetup.imgUrl
     }     
   },
@@ -271,6 +298,7 @@ export default {
           coordinates: [],
           locality: ''
         },
+        alternateLocation: '',
         description: '',
         date: new Date().toISOString().substr(0, 10),
         time: '00:00',
@@ -303,6 +331,11 @@ export default {
         return []
       }
     },
+    checkLocation () {
+      if (this.formData.location.name === '' && this.formData.alternateLocation === '') {
+        return ["Map location and Alternate location are empty. Please provide one"]
+      }
+    }
   },
   methods: {
     openMapDialog () {

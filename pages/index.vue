@@ -36,7 +36,7 @@
           <v-carousel-item v-for="(meetup,i) in meetups" :key="i"
             :src="meetup.imgUrl"
           >
-            <h1 class="text-xs-center red--text darken-2 font-weight-black" :key="meetup.title">{{ meetup.location.locality }}</h1>
+            <h1 class="text-xs-center red--text darken-2 font-weight-black" :key="meetup.title">{{ meetup.alternateLocation !== '' ?meetup.alternateLocation :meetup.location.locality }}</h1>
           </v-carousel-item>                        
         </v-carousel>
       </v-flex>
