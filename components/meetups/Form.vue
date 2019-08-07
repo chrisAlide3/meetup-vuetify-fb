@@ -232,8 +232,7 @@ export default {
       this.formData.userId = this.meetup.userId,
       this.formData.imgName = this.meetup.imgName,
       this.formData.imgUrl = this.meetup.imgUrl
-
-    }
+    }     
   },
   data () {
     return {
@@ -315,7 +314,11 @@ export default {
       const long = position.coords.longitude
       const lat = position.coords.latitude
       this.userPosition = [long, lat]
-      this.mapPosition = [long, lat]
+      if (this.meetup) {
+        this.mapPosition = this.meetup.location.coordinates
+      } else {
+        this.mapPosition = [long, lat]
+      }
     },
     setLocation (payload) {
       if (payload.coordinates === this.userPosition) {

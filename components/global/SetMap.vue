@@ -54,7 +54,7 @@
 
 <script>
 import { mapboxConfig } from '~/.config.js'
-import Mapbox from "mapbox-gl"
+// import Mapbox from "mapbox-gl"
 
 import {
   MglMap,
@@ -77,7 +77,8 @@ export default {
   },
 
   created () {
-    this.mapbox = Mapbox
+    // this.mapbox = Mapbox
+    this.createMap()
     this.selectedLocation = this.locationName
   },
   data() {
@@ -136,9 +137,21 @@ export default {
           this.loading = false
         })
     },
+    createMap () {
+      const Mapbox = require("mapbox-gl")
+      this.mapbox = Mapbox
+    },
     loadMap (map) {
       console.log('loadMap', map)
-      if (this.userPosition !== this.coordinates) {
+      console.log('userpos/coordinates:', this.userPosition + '/' + this.coordinates)
+      let same = true
+      for (let index = 0; index < this.userPosition.length; index++) {
+        if (this.userPosition[index] !== this.coordinates[index]) {
+          same = false
+          break
+        }
+      }
+      if (!same) {
         this.zoom = 14
         this.markerCoordinates = this.coordinates
       }
