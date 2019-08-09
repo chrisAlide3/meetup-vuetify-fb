@@ -27,11 +27,19 @@
 
     <!-- Search bar -->
     <v-layout row justify-center>
-      <v-flex xs6 sm4 align-self-center>
+      <v-flex xs12 sm8 align-self-center>
         <Search />
       </v-flex>
-      <v-flex xs6 sm4 text-xs-right class="mt-2">
-        <Sort :sortButtons="sortButtons" :activeSort="activeSort" @onSortChange="changeSort"/>
+    </v-layout>
+
+    <!-- Sort bar -->
+    <v-layout row justify-center>
+      <v-flex xs12 sm8>
+        <v-layout row justify-end>
+          <v-flex xs12 sm6 text-xs-right>
+            <Sort :sortButtons="sortButtons" :activeSort="activeSort" @onSortChange="changeSort"/>
+          </v-flex>
+        </v-layout>
       </v-flex>
     </v-layout>
 
