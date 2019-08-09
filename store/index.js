@@ -1,10 +1,13 @@
-// import * as firebase from 'firebase'
 import { fireAuth, fireStore, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 
 export const state = () => ({
   user: '',
   meetups: [],
+  meetupsSort: {
+    name: '',
+    order: ''
+  },
   loading: [],
   error: null,
   searchString: ''
@@ -55,6 +58,51 @@ export const mutations = {
       state.meetups[index].imgUrl = ''
     }
   },
+  setMeetupsSort (state, meetupsSort) {
+    state.meetupsSort = meetupsSort
+  },
+  sortMeetups (state) {
+    console.log('sortMeetups', state.meetupsSort)
+    if (state.meetupsSort.name !== '') {
+      let sortField = state.meetupsSort.name.toLowerCase()
+      const sortOrder = state.meetupsSort.order
+      const fieldType = typeof(sortField)
+
+      if (sortField === 'location') {
+        sortField = 'location[name]'
+      }
+
+      const sortedMeetups = state.meetups.sort( (a, b) => {
+          if (fieldType === 'string') {
+            if (sortOrder === 'asc')
+              if (a[sortField] > b[sortField]) {
+                return 1
+              } else if (b[sortField] > a[sortField]) {
+                return -1
+              } else {
+                return 0
+              }
+            else {
+              if (b[sortField] > a[sortField]) {
+                return 1
+              } else if (a[sortField] > b[sortField]) {
+                return -1
+              } else {
+                return 0
+              }
+            }
+
+          } else {
+            if (sortOrder === 'asc') {
+              return a[sortField] - b[sortField]
+            } else {
+              return b[sortField] - a[sortField]
+            }
+          } 
+      })
+      state.meetups = sortedMeetups
+    }
+  },
 
   setError (state, error) {
     state.error = error
@@ -89,6 +137,8 @@ export const actions = {
           meetups.push({...doc.data(), id: doc.id})
       })
       vuexContext.commit('loadMeetups', meetups)
+      vuexContext.commit('setMeetupsSort', {name: 'Date', order: 'desc'})
+      vuexContext.commit('sortMeetups')
       // Load userData
       let signedInUser = ''
       const authId = serverContext.app.$cookies.get('userId')
@@ -417,6 +467,12 @@ export const actions = {
         console.log(error)
       })
   },
+  setMeetupsSort ({ commit }, meetupsSort) {
+    commit('setMeetupsSort', meetupsSort)
+  },
+  sortMeetups ({ commit }) {
+    commit('sortMeetups')
+  },
   clearError ({ commit }) {
     commit('clearError')
   },
@@ -440,6 +496,9 @@ export const getters = {
   },
   meetups (state) {
     return state.meetups
+  },
+  meetupsSort (state) {
+    return state.meetupsSort
   },
   isLoggedIn (state) {
     if (state.user.id) {
