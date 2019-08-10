@@ -37,7 +37,11 @@
       <v-flex xs12 sm8>
         <v-layout row justify-end>
           <v-flex xs12 sm6 text-xs-right>
-            <Sort :sortButtons="sortButtons" :activeSort="activeSort" @onSortChange="changeSort"/>
+            <Sort
+              :sortButtons="sortButtons"
+              :activeSort="activeSort"
+              :sortBarStyle="'icon'" 
+              @onSortChange="changeSort"/>
           </v-flex>
         </v-layout>
       </v-flex>
@@ -70,11 +74,7 @@ export default {
   },
   data () {
     return {
-      sortButtons: ['Date', 'Title', 'Location'],
-      // activeSort: {
-      //   name: '',
-      //   order: '',
-      // },
+      sortButtons: ['Date', 'Title'],
       // Snackbar Data
       snackbar: false,
       y: 'top',
@@ -98,23 +98,8 @@ export default {
       }
     },
     activeSort () {
-      console.log('activeSort', this.$store.getters.meetupsSort)
       return this.$store.getters.meetupsSort
     },
-    // sortedMeetups () {
-    //   if (this.activeSort.name === '') {
-    //     return this.meetups
-    //   }
-
-    //   let sortField = this.activeSort.name.toLowerCase()
-    //   if (sortField === 'location') {
-    //     sortField = 'location.name'
-    //   }
-
-    //   return this.meetups.sort( (a, b) => {
-    //     return a.sortField - b.sortField
-    //   })
-    // }
   },
   methods: {
     joinMeetup (payload) {
@@ -126,15 +111,10 @@ export default {
         })
     },
     changeSort (buttonName) {
-      console.log('changeSort', buttonName)
       if (buttonName === this.activeSort.name) {
-        if (this.activeSort.order === 'asc') {
-          this.$store.dispatch('setMeetupsSort', {name: buttonName, order: 'desc'})
-        } else {
-          this.$store.dispatch('setMeetupsSort', {name: buttonName, order: 'asc'})
-        }
+        this.$store.dispatch('setMeetupsSort', {name: buttonName, orderAsc: !this.activeSort.orderAsc, orderDesc: !this.activeSort.orderDesc})
       } else {
-        this.$store.dispatch('setMeetupsSort', {name: buttonName, order: 'asc'})
+        this.$store.dispatch('setMeetupsSort', {name: buttonName, orderAsc: true, orderDesc: false})
       }
       this.$store.dispatch('sortMeetups')
     }
