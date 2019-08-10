@@ -6,7 +6,8 @@ export const state = () => ({
   meetups: [],
   meetupsSort: {
     name: '',
-    order: ''
+    orderAsc: false,
+    orderDesc: false
   },
   loading: [],
   error: null,
@@ -62,19 +63,15 @@ export const mutations = {
     state.meetupsSort = meetupsSort
   },
   sortMeetups (state) {
-    console.log('sortMeetups', state.meetupsSort)
     if (state.meetupsSort.name !== '') {
       let sortField = state.meetupsSort.name.toLowerCase()
-      const sortOrder = state.meetupsSort.order
+      const sortAsc = state.meetupsSort.orderAsc
+      const sortDesc = state.meetupsSort.orderDesc
       const fieldType = typeof(sortField)
-
-      if (sortField === 'location') {
-        sortField = 'location[name]'
-      }
 
       const sortedMeetups = state.meetups.sort( (a, b) => {
           if (fieldType === 'string') {
-            if (sortOrder === 'asc')
+            if (sortAsc)
               if (a[sortField] > b[sortField]) {
                 return 1
               } else if (b[sortField] > a[sortField]) {
@@ -93,7 +90,7 @@ export const mutations = {
             }
 
           } else {
-            if (sortOrder === 'asc') {
+            if (sortAsc) {
               return a[sortField] - b[sortField]
             } else {
               return b[sortField] - a[sortField]
@@ -137,8 +134,8 @@ export const actions = {
           meetups.push({...doc.data(), id: doc.id})
       })
       vuexContext.commit('loadMeetups', meetups)
-      vuexContext.commit('setMeetupsSort', {name: 'Date', order: 'desc'})
-      vuexContext.commit('sortMeetups')
+      // vuexContext.commit('setMeetupsSort', {name: 'Date', orderAsc: false, orderDesc: true})
+      // vuexContext.commit('sortMeetups')
       // Load userData
       let signedInUser = ''
       const authId = serverContext.app.$cookies.get('userId')

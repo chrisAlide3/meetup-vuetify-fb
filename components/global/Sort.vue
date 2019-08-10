@@ -1,39 +1,68 @@
 <template>
   <div>
-    <span class="blue--text">Sort by:</span>
-    <v-btn v-for="(button) in sortButtons" :key="button"
-       small
-       flat
-       class="ma-0 pa-0"
-       @click="onSortChange(button)"
-    >
-    {{button}}
-      <v-icon v-if="button === activeSort.name && activeSort.order === 'desc'"
-        class="blue--text"
+    <!-- Sort-buttons on bigger screens -->
+    <div v-if="sortBarStyle === 'button'" class="hidden-sm-and-down">
+      <span class="blue--text">Sort by:</span>
+      <v-btn v-for="(button) in sortButtons" :key="button"
+        small
+        flat
+        class="ma-0 pa-0"
+        @click="onSortChange(button)"
       >
-      arrow_drop_up
-      </v-icon>
+      {{button}}
+        <v-icon v-if="button === activeSort.name && activeSort.orderDesc"
+          class="blue--text"
+        >
+        arrow_drop_up
+        </v-icon>
 
-      <v-icon v-else
-        :class="button === activeSort.name && activeSort.order==='asc' ?'blue--text' :''"
-      >
-      arrow_drop_down
-      </v-icon>
-    </v-btn>
+        <v-icon v-else
+          :class="button === activeSort.name && activeSort.orderAsc ?'blue--text' :''"
+        >
+        arrow_drop_down
+        </v-icon>
+      </v-btn>
+    </div>
+    <!-- Sort-Menu on smaller screens or icon on prop sortBarStyle -->
+    <div :class="sortBarStyle==='button' ?'hidden-sm-and-up' :''">
+      <v-menu offset-y :close-on-content-click="false">
+        <template v-slot:activator="{ on }">
+          <v-icon
+            v-on="on"
+            :class="activeSort.name !=='' ?'blue--text' : ''"
+          >
+            sort
+          </v-icon>
+        </template>
+        <v-list>
+          <v-list-tile
+            v-for="button in sortButtons"
+            :key="button"
+            @click="onSortChange(button)"
+          >
+            <v-list-tile-title>
+              <v-icon v-if="button === activeSort.name && activeSort.orderDesc"
+                class="blue--text"
+              >
+              arrow_drop_up
+              </v-icon>
+
+              <v-icon v-else
+                :class="button === activeSort.name && activeSort.orderAsc ?'blue--text' :''"
+              >
+              arrow_drop_down
+              </v-icon>
+              {{ button }}
+            </v-list-tile-title>
+          </v-list-tile>
+        </v-list>
+      </v-menu>
+    </div>
   </div>
 </template>
 
 <script>
 export default {
-  // data () {
-  //   return {
-  //     activeSort: {
-  //       field: '',
-  //       order: '',
-  //       active: true
-  //     }
-  //   }
-  // },
   props: {
     sortButtons: {
       type: Array,
@@ -42,22 +71,14 @@ export default {
     activeSort: {
       type: Object,
       required: true
+    },
+    sortBarStyle: {
+      type: String, //icon, button
+      required: true
     }
-  },
-  created () {
-    console.log(this.sortButtons)
-  //   for (let index = 0; index < this.sortButtons.length; index++) {
-  //     if (this.sortButtons[index].order !== '') {
-  //       this.activeSort.field = this.sortButtons[index].name
-  //       this.activeSort.order = this.sortButtons[index].order
-  //       break
-  //     }
-  //   }
-  //         console.log(this.activeSort)
   },
   methods: {
     onSortChange (field) {
-      console.log('sort.vue', field)
       this.$emit('onSortChange', field)
     }
   }
