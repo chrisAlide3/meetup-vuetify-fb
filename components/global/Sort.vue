@@ -29,7 +29,7 @@
         <template v-slot:activator="{ on }">
           <v-icon
             v-on="on"
-            class="blue--text"
+            :class="activeSort.name !=='' ?'blue--text' : ''"
           >
             sort
           </v-icon>

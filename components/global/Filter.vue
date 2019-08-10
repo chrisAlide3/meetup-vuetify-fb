@@ -16,7 +16,7 @@
             @click="onFilterChange(item)"
           >
             <v-list-tile-title>
-              <span :class="item===activeFilter ?'blue--text' : ''">{{ item }}</span>
+              <span :class="item.name===activeFilter ?'blue--text' : ''"><v-icon left>{{ item.icon }}</v-icon>{{ item.name }}</span>
             </v-list-tile-title>
           </v-list-tile>
         </v-list>

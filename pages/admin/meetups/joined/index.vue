@@ -50,6 +50,21 @@
       </v-flex>
     </v-layout>
 
+    <!-- Sort bar -->
+    <v-layout row justify-center>
+      <v-flex xs12 sm8>
+        <v-layout row justify-end>
+          <v-flex xs12 sm6 text-xs-right>
+            <Sort
+              :sortButtons="sortButtons"
+              :activeSort="activeSort"
+              :sortBarStyle="'icon'" 
+              @onSortChange="changeSort"/>
+          </v-flex>
+        </v-layout>
+      </v-flex>
+    </v-layout>
+
     <!-- Horizontal Card -->
     <v-layout row justify-center
       v-for="meetup in meetups"
@@ -72,14 +87,17 @@
 <script>
 import MeetupHorizontal from '@/components/meetups/MeetupHorizontal'
 import Search from '@/components/global/Search'
+import Sort from '@/components/global/Sort'
 
 export default {
   components: {
     MeetupHorizontal,
-    Search
+    Search,
+    Sort
   },
   data () {
     return {
+      sortButtons: ['Date', 'Title'],
       // Snackbar Data
       snackbar: false,
       y: 'top',
@@ -118,6 +136,9 @@ export default {
           })
         }
       }
+    },
+    activeSort () {
+      return this.$store.getters.meetupsSort
     }
   },
   methods: {
@@ -144,6 +165,14 @@ export default {
           this.snackbar = true
         })
     },
+    changeSort (buttonName) {
+      if (buttonName === this.activeSort.name) {
+        this.$store.dispatch('setMeetupsSort', {name: buttonName, orderAsc: !this.activeSort.orderAsc, orderDesc: !this.activeSort.orderDesc})
+      } else {
+        this.$store.dispatch('setMeetupsSort', {name: buttonName, orderAsc: true, orderDesc: false})
+      }
+      this.$store.dispatch('sortMeetups')
+    }
   },
   middleware: ['checkAuth']
 }

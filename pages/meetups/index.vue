@@ -80,7 +80,11 @@ export default {
   data () {
     return {
       sortButtons: ['Date', 'Title'],
-      filterItems: ['All', 'Joined', 'Mine'],
+      filterItems: [
+        { name: 'All', icon: 'filter_list' },
+        { name:  'Joined', icon: 'add_location' },
+        { name:  'Mine', icon: 'person_pin_circle' }
+      ],
       activeFilter: 'All',
       // Snackbar Data
       snackbar: false,
@@ -154,8 +158,7 @@ export default {
       this.$store.dispatch('sortMeetups')
     },
     filterMeetups (field) {
-      this.activeFilter = field
-      console.log('filterMeetups', field)
+      this.activeFilter = field.name
     }
   }
 } 

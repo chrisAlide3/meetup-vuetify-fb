@@ -134,8 +134,8 @@ export const actions = {
           meetups.push({...doc.data(), id: doc.id})
       })
       vuexContext.commit('loadMeetups', meetups)
-      vuexContext.commit('setMeetupsSort', {name: 'Date', orderAsc: false, orderDesc: true})
-      vuexContext.commit('sortMeetups')
+      // vuexContext.commit('setMeetupsSort', {name: 'Date', orderAsc: false, orderDesc: true})
+      // vuexContext.commit('sortMeetups')
       // Load userData
       let signedInUser = ''
       const authId = serverContext.app.$cookies.get('userId')
