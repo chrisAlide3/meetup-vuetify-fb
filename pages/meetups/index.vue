@@ -32,7 +32,7 @@
       </v-flex>
     </v-layout>
 
-    <!-- Sort bar -->
+    <!-- Sort/filter bar -->
     <v-layout row justify-center>
       <v-flex xs12 sm8>
         <v-layout row justify-end>
@@ -42,6 +42,9 @@
               :activeSort="activeSort"
               :sortBarStyle="'icon'" 
               @onSortChange="changeSort"/>
+          </v-flex>
+          <v-flex text-xs-right shrink>
+            <MeetupFilter v-if="user" :items="filterItems" :activeFilter="activeFilter" @onFilterChange="filterMeetups"/>
           </v-flex>
         </v-layout>
       </v-flex>
@@ -65,16 +68,20 @@
 import MeetupHorizontal from '@/components/meetups/MeetupHorizontal'
 import Search from '@/components/global/Search'
 import Sort from '@/components/global/Sort'
+import MeetupFilter from '@/components/global/Filter'
 
 export default {
   components: {
     MeetupHorizontal,
     Search,
-    Sort
+    Sort,
+    MeetupFilter
   },
   data () {
     return {
       sortButtons: ['Date', 'Title'],
+      filterItems: ['All', 'Joined', 'Mine'],
+      activeFilter: 'All',
       // Snackbar Data
       snackbar: false,
       y: 'top',
@@ -88,11 +95,39 @@ export default {
     searchString () {
       return this.$store.getters.searchString
     },
+    user () {
+      return this.$store.getters.user
+    },
     meetups () {
+      const meetups = this.$store.getters.meetups
+      let displayMeetups = meetups
+      // Filter meetups
+      switch (this.activeFilter) {
+        case 'Joined':
+          if (this.user) {
+            if (this.user.registeredMeetups.length > 0) {
+              displayMeetups = meetups.filter(meetup => {
+                return this.user.registeredMeetups.includes(meetup.id) 
+              })
+            } else {
+              displayMeetups = []
+              return displayMeetups
+            }
+          }
+          break
+        case 'Mine':
+          if (this.user) {
+            displayMeetups = meetups.filter(meetup => {
+              return meetup.userId = this.user.id
+            })
+          }
+          break
+      }
+
       if (this.searchString === '') {
-        return this.$store.getters.meetups
+        return displayMeetups
       } else {
-        return this.$store.getters.meetups.filter(meetup => {
+        return displayMeetups.filter(meetup => {
           return meetup.title.toUpperCase().includes(this.searchString.toUpperCase())
         })
       }
@@ -117,6 +152,10 @@ export default {
         this.$store.dispatch('setMeetupsSort', {name: buttonName, orderAsc: true, orderDesc: false})
       }
       this.$store.dispatch('sortMeetups')
+    },
+    filterMeetups (field) {
+      this.activeFilter = field
+      console.log('filterMeetups', field)
     }
   }
 } 
