@@ -2,7 +2,7 @@
   <v-container>
     <!-- Dialog for Map -->
     <v-layout row justify-center v-if="showMap">
-      <v-dialog v-model="dialog" max-width="800">
+      <v-dialog v-model="mapDialog" max-width="800">
         <template v-slot:activator="{ on }">
         </template>
         <v-card>
@@ -11,7 +11,38 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="green darken-2" flat @click="dialog=false">Close</v-btn>
+            <v-btn color="green darken-2" flat @click="mapDialog=false">Close</v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-layout>
+
+    <!-- Dialog for Delete meetup -->
+    <v-layout row justify-center>
+      <v-dialog v-model="deleteDialog" max-width="800">
+        <v-card>
+          <v-card-title class="headline" text-xs-center>Confirm delete</v-card-title>
+          <v-card-text>
+            <div v-if="registeredUsers.length > 0">
+              <v-divider></v-divider>
+              <p class="title mt-4">These users have already joined this meetup!</p>
+              <v-layout column>
+                <v-flex v-for="user in registeredUsers" :key="user.id">
+                  <UserHorizontalCard :user="user" />
+                </v-flex>
+              </v-layout>
+            </div>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn color="black" flat @click="deleteDialog=false">
+              <v-icon left>cancel</v-icon>
+            Cancel
+            </v-btn>
+            <v-btn color="red darken-2" flat @click="deleteMeetup">
+              <v-icon left>delete</v-icon>
+            Delete
+            </v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -30,7 +61,9 @@
               <v-card-title primary-title class="text-xs-center">
                 <div>
                   <h3 class="headline mb-0">{{ meetup.title }}</h3>
-                  <div class="title primary--text my-2">{{ meetup.alternateLocation !== '' ?meetup.alternateLocation :meetup.location.name }} <v-icon @click="showDialog" color="secondary">map</v-icon></div>
+                  <div class="title primary--text my-2">{{ meetup.alternateLocation !== '' ?meetup.alternateLocation :meetup.location.name }}
+                    <v-icon @click="showMapDialog" color="secondary">map</v-icon>
+                  </div>
                   <div>{{ meetup.date | date }} at {{ meetup.time }}</div>
                 </div>
               </v-card-title>
@@ -52,6 +85,10 @@
                   <v-icon left>edit</v-icon>
                   Edit
                 </v-btn>
+                <v-btn v-if="user.id === meetup.userId" flat color="error" @click="confirmDeleteMeetup">
+                  <v-icon left>delete</v-icon>
+                  Delete
+                </v-btn>
               </template>
               <v-btn flat color="orange">
                 <v-icon left>share</v-icon>
@@ -67,15 +104,20 @@
 
 <script>
 import DisplayMap from '~/components/global/DisplayMap'
+import UserHorizontalCard from '@/components/users/HorizontalCard'
 
 export default {
   components: {
-    DisplayMap
+    DisplayMap,
+    UserHorizontalCard
   },
   data () {
     return {
+      // MapDialog
       showMap: false,
-      dialog: false
+      mapDialog: false,
+      // DeleteDialog
+      deleteDialog: false
     }
   },
   props: {
@@ -90,12 +132,35 @@ export default {
     },
     user () {
       return this.$store.getters.user
+    },
+    registeredUsers () {
+      let users = this.$store.getters.users
+      let joinedUsers = []
+      if (users) {
+        for (let user of users) {
+          if (user.registeredMeetups.length > 0) {
+            for (let meetup of user.registeredMeetups) {
+              if (meetup === this.meetup.id) {
+                joinedUsers.push(user)
+                break
+              }
+            }
+          }
+        }
+      }
+      return joinedUsers
     }
   },
   methods: {
-    showDialog () {
-      this.dialog = true
+    showMapDialog () {
+      this.mapDialog = true
       this.showMap = true
+    },
+    confirmDeleteMeetup () {
+      this.deleteDialog = true
+    },
+    deleteMeetup () {
+      alert('deleteMeetup ', this.meetup.id)
     }
   }
 }
