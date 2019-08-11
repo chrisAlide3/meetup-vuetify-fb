@@ -85,7 +85,7 @@
     </v-navigation-drawer>
 
     <!-- Toolbar -->
-    <v-toolbar app dark class="teal darken-1">
+    <v-toolbar app dark class="primary">
 
       <v-toolbar-side-icon
         class="hidden-sm-and-up"
