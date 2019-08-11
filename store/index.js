@@ -60,6 +60,12 @@ export const mutations = {
       state.meetups[index] = formData
     }
   },
+  deleteMeetupFromMeetups (state, id) {
+    const index = state.meetups.findIndex(i => i.id == id)
+    if (index > -1) {
+      state.meetups.splice(index, 1)
+    }
+  },
   clearMeetupImageFields (state, meetupId) {
     const index = state.meetups.findIndex(i => i.id == meetupId)
     if (index >= 0) {
@@ -478,11 +484,12 @@ export const actions = {
         .catch(err => console.log(err))
     }
   },
-  removeMeetupImage ({ commit }, payload) {
+  removeMeetupImage ({ commit, dispatch }, payload) {
     // Create a reference to the file to delete
-    const ref = fireStorage.ref('meetups/' + payload.imgName)
+    // const ref = fireStorage.ref('meetups/' + payload.imgName)
     // Delete the file
-    return ref.delete()
+    // return ref.delete()
+    return dispatch('deleteMeetupImage', payload.imgName)
       .then(function() {
         // Clear image fields on meetup
         const userRef = fireDb.collection('meetups').doc(payload.meetupId)
@@ -501,6 +508,28 @@ export const actions = {
       })
       .catch(function(error) {
         console.log(error)
+      })
+  },
+  deleteMeetupImage ({ commit }, imgName) {
+    // Create a reference to the file to delete
+    const ref = fireStorage.ref('meetups/' + imgName)
+    // Delete the file
+    return ref.delete()
+      .then(() => {
+        console.log('image deleted')
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  },
+  deleteMeetup ({ commit }, id) {
+    return fireDb.collection('meetups').doc(id).delete()
+      .then(() => {
+        console.log('meetup deleted(store)')
+        commit('deleteMeetupFromMeetups', id)
+      })
+      .catch(err => {
+        console.error(err)
       })
   },
   setMeetupsSort ({ commit }, meetupsSort) {

@@ -19,7 +19,7 @@
 
     <!-- Dialog for Delete meetup -->
     <v-layout row justify-center>
-      <v-dialog v-model="deleteDialog" max-width="800">
+      <v-dialog v-model="deleteDialog" max-width="500">
         <v-card>
           <v-card-title class="headline" text-xs-center>Confirm delete</v-card-title>
           <v-card-text>
@@ -48,6 +48,7 @@
       </v-dialog>
     </v-layout>
 
+    <!-- Card -->
     <v-layout row justify-center>
       <v-flex xs12 sm8 md6>
         <v-card>
@@ -160,7 +161,25 @@ export default {
       this.deleteDialog = true
     },
     deleteMeetup () {
-      alert('deleteMeetup ', this.meetup.id)
+      if (this.meetup.imgName !== '') {
+        this.$store.dispatch('deleteMeetupImage', this.meetup.imgName)
+          .then(() => {
+          })
+      }
+      if (this.registeredUsers.length > 0) {
+        for (let user of this.registeredUsers) {
+          this.$store.dispatch('removeMeetupFromUser', {idUser: user.id, idMeetup: this.meetup.id})
+          .then(() => {
+          })
+        }
+      }
+
+      this.$store.dispatch('deleteMeetup', this.meetup.id)
+        .then(() => {
+          console.log('meetup deleted')
+          this.deleteDialog = false
+          this.$router.go(-1)
+        })
     }
   }
 }
