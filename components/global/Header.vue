@@ -179,6 +179,7 @@ export default {
           { title: 'My Meetups', icon: 'person_pin_circle', route: '/admin/meetups' },
           { title: 'Joined Meetups', icon: 'add_location', route: '/admin/meetups/joined' },
           { title: 'Organise Meetup', icon: 'group_add', route: '/admin/meetups/new' },
+          { title: 'View Users', icon: 'person_add', route: '/admin/users' },
           { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, subItems: [
               { title: 'Edit', icon: 'edit', route: '/admin/users/' + this.$store.getters.user.id  }, 
               { title: 'Logout', icon: 'arrow_back' }

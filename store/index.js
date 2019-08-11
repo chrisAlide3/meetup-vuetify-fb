@@ -3,6 +3,7 @@ import { fireAuth, fireStore, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 export const state = () => ({
   user: '',
+  users: [],
   meetups: [],
   meetupsSort: {
     name: '',
@@ -18,8 +19,15 @@ export const mutations = {
   loadUser (state, user) {
     state.user = user
   },
+  loadUsers (state, users) {
+    state.users = users
+  },
   logoutUser (state) {
     state.user = ''
+  },
+  addUserToUsers (state, user) {
+    console.log('addUserToUsers', user)
+    state.users.push(user)
   },
   updateUser ( state, formData) {
     state.user.firstname = formData.firstname
@@ -136,26 +144,43 @@ export const actions = {
       vuexContext.commit('loadMeetups', meetups)
       // vuexContext.commit('setMeetupsSort', {name: 'Date', orderAsc: false, orderDesc: true})
       // vuexContext.commit('sortMeetups')
-      // Load userData
-      let signedInUser = ''
-      const authId = serverContext.app.$cookies.get('userId')
-      if (authId != undefined) {
-        return fireDb.collection('users').where('authid', "==", authId).get()
-          .then(function(querySnapshot) {
-            querySnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                signedInUser = {...doc.data(), id: doc.id}
+
+      // Load Users
+      return fireDb.collection('users').get()
+        .then(docs => {
+          let users = []
+          docs.forEach(doc => {
+            let user = {...doc.data(), id: doc.id }
+            users.push(user)
+          })
+          vuexContext.commit('loadUsers', users)
+          
+          // Load userData
+          let signedInUser = ''
+          const authId = serverContext.app.$cookies.get('userId')
+          if (authId != undefined) {
+            return fireDb.collection('users').where('authid', "==", authId).get()
+              .then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    // doc.data() is never undefined for query doc snapshots
+                    signedInUser = {...doc.data(), id: doc.id}
+                  })
+                vuexContext.commit('loadUser', signedInUser)
               })
-            vuexContext.commit('loadUser', signedInUser)
-          })
-          .catch(function(error) {
-              console.log("Error getting documents: ", error);
-          })
-      } else {
-        return signedInUser
-      }
+              .catch(function(error) {
+                  console.log("Error getting documents: ", error);
+              })
+          } else {
+            return signedInUser
+          }
+
+        })
+        .catch(err => {
+          console.error(err)
+        })
+          
+      })
       
-    })
     .catch(function(error) {
         console.log("Error getting documents: ", error);
     })
@@ -344,6 +369,20 @@ export const actions = {
         console.log(error)
       })
   },
+  loadUsers ({ commit }) {
+    return fireDb.collection('users').get()
+      .then(docs => {
+        docs.forEach(doc => {
+          const userData = doc.data()
+          const userId = doc.id
+          user = {...userData, id: userId }
+          commit('addUserToUsers', doc.data())
+        })
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  },
   addMeetupToUser ({ commit }, payload) {
     return fireDb.collection("users").doc(payload.idUser).update({
       registeredMeetups: fireStore.FieldValue.arrayUnion(payload.idMeetup)
@@ -490,6 +529,9 @@ export const getters = {
   },
   user (state) {
     return state.user
+  },
+  users (state) {
+    return state.users
   },
   meetups (state) {
     return state.meetups
