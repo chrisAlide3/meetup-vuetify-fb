@@ -11,8 +11,8 @@
         </template>
         <v-list>
           <v-list-tile
-            v-for="item in items"
-            :key="item"
+            v-for="(item, index) in items"
+            :key="index"
             @click="onFilterChange(item)"
           >
             <v-list-tile-title>

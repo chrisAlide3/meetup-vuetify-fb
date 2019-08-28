@@ -3,6 +3,7 @@ import { fireAuth, fireStore, fireDb, fireStorage } from '~/plugins/firebase.js'
 
 export const state = () => ({
   user: '',
+  users: [],
   meetups: [],
   meetupsSort: {
     name: '',
@@ -18,26 +19,51 @@ export const mutations = {
   loadUser (state, user) {
     state.user = user
   },
+  loadUsers (state, users) {
+    state.users = users
+  },
   logoutUser (state) {
     state.user = ''
   },
-  updateUser ( state, formData) {
+  addUserToUsers (state, user) {
+    state.users.push(user)
+  },
+  updateUser (state, formData) {
     state.user.firstname = formData.firstname
     state.user.surname = formData.surname
     state.user.imgUrl = formData.imgUrl
     state.user.imgName = formData.imgName
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === formData.id)
+    state.users[userIndex].firstname = formData.firstname
+    state.users[userIndex].surname = formData.surname
+    state.users[userIndex].imgUrl = formData.imgUrl
+    state.users[userIndex].imgName = formData.imgName
   },
-  clearUserImageFields (state) {
+  clearUserImageFields (state, userId) {
     state.user.imgUrl = ''
     state.user.imgName = ''
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === userId)
+    state.users[userIndex].imgUrl = ''
+    state.users[userIndex].imgName = ''
   },
-  addMeetupToUser (state, meetupId) {
-    state.user.registeredMeetups.push(meetupId)
+  addMeetupToUser (state, payload) {
+    state.user.registeredMeetups.push(payload.idMeetup)
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === payload.idUser)
+    state.users[userIndex].registeredMeetups.push(payload.idMeetup)
   },
-  removeMeetupFromUser (state, meetupId) {
-    const index = state.user.registeredMeetups.lastIndexOf(meetupId)
+  removeMeetupFromUser (state, payload) {
+    const index = state.user.registeredMeetups.lastIndexOf(payload.idMeetup)
     if (index > -1) {
       state.user.registeredMeetups.splice(index, 1)
+    }
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === payload.idUser)
+    const registeredIndex = state.users[userIndex].registeredMeetups.lastIndexOf(payload.idMeetup)
+    if (registeredIndex > -1) {
+      state.users[userIndex].registeredMeetups.splice(registeredIndex, 1)
     }
   },
   loadMeetups (state, meetups) {
@@ -50,6 +76,12 @@ export const mutations = {
     const index = state.meetups.findIndex(i => i.id == formData.id)
     if (index >= 0) {
       state.meetups[index] = formData
+    }
+  },
+  deleteMeetupFromMeetups (state, id) {
+    const index = state.meetups.findIndex(i => i.id == id)
+    if (index > -1) {
+      state.meetups.splice(index, 1)
     }
   },
   clearMeetupImageFields (state, meetupId) {
@@ -136,26 +168,43 @@ export const actions = {
       vuexContext.commit('loadMeetups', meetups)
       // vuexContext.commit('setMeetupsSort', {name: 'Date', orderAsc: false, orderDesc: true})
       // vuexContext.commit('sortMeetups')
-      // Load userData
-      let signedInUser = ''
-      const authId = serverContext.app.$cookies.get('userId')
-      if (authId != undefined) {
-        return fireDb.collection('users').where('authid', "==", authId).get()
-          .then(function(querySnapshot) {
-            querySnapshot.forEach(function(doc) {
-                // doc.data() is never undefined for query doc snapshots
-                signedInUser = {...doc.data(), id: doc.id}
+
+      // Load Users
+      return fireDb.collection('users').get()
+        .then(docs => {
+          let users = []
+          docs.forEach(doc => {
+            let user = {...doc.data(), id: doc.id }
+            users.push(user)
+          })
+          vuexContext.commit('loadUsers', users)
+          
+          // Load userData
+          let signedInUser = ''
+          const authId = serverContext.app.$cookies.get('userId')
+          if (authId != undefined) {
+            return fireDb.collection('users').where('authid', "==", authId).get()
+              .then(function(querySnapshot) {
+                querySnapshot.forEach(function(doc) {
+                    // doc.data() is never undefined for query doc snapshots
+                    signedInUser = {...doc.data(), id: doc.id}
+                  })
+                vuexContext.commit('loadUser', signedInUser)
               })
-            vuexContext.commit('loadUser', signedInUser)
-          })
-          .catch(function(error) {
-              console.log("Error getting documents: ", error);
-          })
-      } else {
-        return signedInUser
-      }
+              .catch(function(error) {
+                  console.log("Error getting documents: ", error);
+              })
+          } else {
+            return signedInUser
+          }
+
+        })
+        .catch(err => {
+          console.error(err)
+        })
+          
+      })
       
-    })
     .catch(function(error) {
         console.log("Error getting documents: ", error);
     })
@@ -212,6 +261,7 @@ export const actions = {
                               console.log('Image URL updated')
                               commit('clearError')
                               commit('loadUser', newUser)
+                              commit('addUserToUsers', newUser)
                             })
                             .catch(err => console.log(err))
                         })
@@ -221,6 +271,7 @@ export const actions = {
                 } else {
                   commit('clearError')
                   commit('loadUser', newUser)
+                  commit('addUserToUsers', newUser)
                 }
               })
               .catch(function(err) {
@@ -310,6 +361,7 @@ export const actions = {
     }, { merge: true })
     return setWithMerge
       .then(function() {
+        payload.formData.id = payload.userid
         commit('updateUser', payload.formData)
         commit('clearError')
       })
@@ -334,7 +386,7 @@ export const actions = {
       
         return setWithMerge
           .then(function() {
-            commit('clearUserImageFields')
+            commit('clearUserImageFields', payload.userid)
           })
           .catch((err) => {
             console.error("Error clearing image fields: ", err);
@@ -344,13 +396,27 @@ export const actions = {
         console.log(error)
       })
   },
+  loadUsers ({ commit }) {
+    return fireDb.collection('users').get()
+      .then(docs => {
+        docs.forEach(doc => {
+          const userData = doc.data()
+          const userId = doc.id
+          user = {...userData, id: userId }
+          commit('addUserToUsers', doc.data())
+        })
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  },
   addMeetupToUser ({ commit }, payload) {
     return fireDb.collection("users").doc(payload.idUser).update({
       registeredMeetups: fireStore.FieldValue.arrayUnion(payload.idMeetup)
     })
       .then(response => {
         console.log(response)
-        commit('addMeetupToUser', payload.idMeetup)
+        commit('addMeetupToUser', payload)
       })
       .catch(err => {
         console.error(err)
@@ -362,7 +428,7 @@ export const actions = {
     })
       .then(response => {
         console.log(response)
-        commit('removeMeetupFromUser', payload.idMeetup)
+        commit('removeMeetupFromUser', payload)
       })
       .catch(err => {
         console.error(err)
@@ -439,11 +505,12 @@ export const actions = {
         .catch(err => console.log(err))
     }
   },
-  removeMeetupImage ({ commit }, payload) {
+  removeMeetupImage ({ commit, dispatch }, payload) {
     // Create a reference to the file to delete
-    const ref = fireStorage.ref('meetups/' + payload.imgName)
+    // const ref = fireStorage.ref('meetups/' + payload.imgName)
     // Delete the file
-    return ref.delete()
+    // return ref.delete()
+    return dispatch('deleteMeetupImage', payload.imgName)
       .then(function() {
         // Clear image fields on meetup
         const userRef = fireDb.collection('meetups').doc(payload.meetupId)
@@ -462,6 +529,28 @@ export const actions = {
       })
       .catch(function(error) {
         console.log(error)
+      })
+  },
+  deleteMeetupImage ({ commit }, imgName) {
+    // Create a reference to the file to delete
+    const ref = fireStorage.ref('meetups/' + imgName)
+    // Delete the file
+    return ref.delete()
+      .then(() => {
+        console.log('image deleted')
+      })
+      .catch(err => {
+        console.error(err)
+      })
+  },
+  deleteMeetup ({ commit }, id) {
+    return fireDb.collection('meetups').doc(id).delete()
+      .then(() => {
+        console.log('meetup deleted(store)')
+        commit('deleteMeetupFromMeetups', id)
+      })
+      .catch(err => {
+        console.error(err)
       })
   },
   setMeetupsSort ({ commit }, meetupsSort) {
@@ -490,6 +579,9 @@ export const getters = {
   },
   user (state) {
     return state.user
+  },
+  users (state) {
+    return state.users
   },
   meetups (state) {
     return state.meetups

@@ -72,7 +72,8 @@ export default {
   // },
   vuetify: {
     theme: {
-      primary: colors.teal.base,
+      // primary: colors.teal.base,
+      primary: colors.purple.base,
       secondary: colors.cyan.base,
       accent: colors.blue.base,
       error: colors.red.base,
