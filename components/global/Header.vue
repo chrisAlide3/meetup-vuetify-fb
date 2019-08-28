@@ -112,8 +112,41 @@
             </v-icon>
           {{ item.title }}
           </v-btn>
+
+          <!-- Dropdown menu for Meetups -->
+          <v-menu v-if="item.subItems && item.title==='Meetups'" :key="item.title" offset-y >
+            <v-btn
+              slot="activator"
+              flat
+              dark
+            >
+              <v-icon left>
+                {{ item.icon }}
+              </v-icon>
+                Meetups
+              <v-icon class="ml-2">
+                expand_more
+              </v-icon>
+            </v-btn>
+            <v-list>
+              <template v-for="(item, index) in item.subItems">
+                <v-list-tile
+                  :key="index"
+                  router
+                  :to="item.route"
+                  exact
+                >
+                  <v-list-tile-action>
+                    <v-icon>{{ item.icon }}</v-icon>
+                  </v-list-tile-action>
+                  <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+                </v-list-tile>
+              </template>
+            </v-list>
+          </v-menu>
+
           <!-- Dropdown menu for Profile -->
-          <v-menu v-if="item.subItems" :key="item.title" offset-y >
+          <v-menu v-if="item.subItems && item.title==='Profile'" :key="item.title" offset-y >
             <v-btn
               slot="activator"
               flat
@@ -175,11 +208,16 @@ export default {
       ]
       if (this.isLoggedIn) {
         menuItems = [
-          { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
-          { title: 'My Meetups', icon: 'person_pin_circle', route: '/admin/meetups' },
-          { title: 'Joined Meetups', icon: 'add_location', route: '/admin/meetups/joined' },
-          { title: 'Organise Meetup', icon: 'group_add', route: '/admin/meetups/new' },
+          { title: 'Meetups', icon: 'supervisor_account', subItems: [
+            { title: 'View Meetups', icon: 'supervisor_account', route: '/meetups' },
+            { title: 'My Meetups', icon: 'person_pin_circle', route: '/admin/meetups' },
+            { title: 'Joined Meetups', icon: 'add_location', route: '/admin/meetups/joined' },
+            { title: 'Organise Meetup', icon: 'group_add', route: '/admin/meetups/new' },
+
+          ]},
+
           { title: 'View Users', icon: 'person_add', route: '/admin/users' },
+
           { title: 'Profile', icon: 'person', avatar: this.user.imgUrl, subItems: [
               { title: 'Edit', icon: 'edit', route: '/admin/users/' + this.$store.getters.user.id  }, 
               { title: 'Logout', icon: 'arrow_back' }
