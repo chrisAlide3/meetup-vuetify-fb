@@ -91,10 +91,6 @@
                   Delete
                 </v-btn>
               </template>
-              <v-btn flat color="orange">
-                <v-icon left>share</v-icon>
-                Share
-              </v-btn>
             </v-card-actions>
           </v-layout>
         </v-card>
