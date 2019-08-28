@@ -26,26 +26,44 @@ export const mutations = {
     state.user = ''
   },
   addUserToUsers (state, user) {
-    console.log('addUserToUsers', user)
     state.users.push(user)
   },
-  updateUser ( state, formData) {
+  updateUser (state, formData) {
     state.user.firstname = formData.firstname
     state.user.surname = formData.surname
     state.user.imgUrl = formData.imgUrl
     state.user.imgName = formData.imgName
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === formData.id)
+    state.users[userIndex].firstname = formData.firstname
+    state.users[userIndex].surname = formData.surname
+    state.users[userIndex].imgUrl = formData.imgUrl
+    state.users[userIndex].imgName = formData.imgName
   },
-  clearUserImageFields (state) {
+  clearUserImageFields (state, userId) {
     state.user.imgUrl = ''
     state.user.imgName = ''
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === userId)
+    state.users[userIndex].imgUrl = ''
+    state.users[userIndex].imgName = ''
   },
-  addMeetupToUser (state, meetupId) {
-    state.user.registeredMeetups.push(meetupId)
+  addMeetupToUser (state, payload) {
+    state.user.registeredMeetups.push(payload.idMeetup)
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === payload.idUser)
+    state.users[userIndex].registeredMeetups.push(payload.idMeetup)
   },
-  removeMeetupFromUser (state, meetupId) {
-    const index = state.user.registeredMeetups.lastIndexOf(meetupId)
+  removeMeetupFromUser (state, payload) {
+    const index = state.user.registeredMeetups.lastIndexOf(payload.idMeetup)
     if (index > -1) {
       state.user.registeredMeetups.splice(index, 1)
+    }
+    // update user in users
+    const userIndex = state.users.findIndex(i => i.id === payload.idUser)
+    const registeredIndex = state.users[userIndex].registeredMeetups.lastIndexOf(payload.idMeetup)
+    if (registeredIndex > -1) {
+      state.users[userIndex].registeredMeetups.splice(registeredIndex, 1)
     }
   },
   loadMeetups (state, meetups) {
@@ -243,6 +261,7 @@ export const actions = {
                               console.log('Image URL updated')
                               commit('clearError')
                               commit('loadUser', newUser)
+                              commit('addUserToUsers', newUser)
                             })
                             .catch(err => console.log(err))
                         })
@@ -252,6 +271,7 @@ export const actions = {
                 } else {
                   commit('clearError')
                   commit('loadUser', newUser)
+                  commit('addUserToUsers', newUser)
                 }
               })
               .catch(function(err) {
@@ -341,6 +361,7 @@ export const actions = {
     }, { merge: true })
     return setWithMerge
       .then(function() {
+        payload.formData.id = payload.userid
         commit('updateUser', payload.formData)
         commit('clearError')
       })
@@ -365,7 +386,7 @@ export const actions = {
       
         return setWithMerge
           .then(function() {
-            commit('clearUserImageFields')
+            commit('clearUserImageFields', payload.userid)
           })
           .catch((err) => {
             console.error("Error clearing image fields: ", err);
@@ -395,7 +416,7 @@ export const actions = {
     })
       .then(response => {
         console.log(response)
-        commit('addMeetupToUser', payload.idMeetup)
+        commit('addMeetupToUser', payload)
       })
       .catch(err => {
         console.error(err)
@@ -407,7 +428,7 @@ export const actions = {
     })
       .then(response => {
         console.log(response)
-        commit('removeMeetupFromUser', payload.idMeetup)
+        commit('removeMeetupFromUser', payload)
       })
       .catch(err => {
         console.error(err)
