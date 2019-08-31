@@ -12,7 +12,7 @@
     </v-layout>
     <v-layout row class="mb-2">
       <v-flex xs12>
-        <no-ssr>
+        <client-only>
         <MglMap id="map"
           :accessToken="accessToken"
           :mapStyle="mapStyle"
@@ -26,7 +26,7 @@
           <MglNavigationControl position="top-right"/>
           <MglGeolocateControl position="top-right" :trackUserLocation="true" />
         </MglMap>
-        </no-ssr>
+        </client-only>
       </v-flex>
     </v-layout>
   </v-container>

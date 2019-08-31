@@ -33,7 +33,7 @@
     <v-layout row>
       <v-flex xs12>
         <!-- Do not run on server. Mapbox can only render in client (see nuxt.config plugins) -->
-        <no-ssr>
+        <client-only>
           <MglMap id="map"
             :accessToken="accessToken"
             :mapStyle="mapStyle"
@@ -49,7 +49,7 @@
             <MglNavigationControl position="top-right"/>
             <MglGeolocateControl position="top-right" :trackUserLocation="true" />
           </MglMap>
-        </no-ssr>
+        </client-only>
       </v-flex>
     </v-layout>
   </v-container>
